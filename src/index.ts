@@ -194,6 +194,27 @@ function getHTML(): string {
     margin-top: 10px;
   }
 
+  .header-current {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 0.88rem;
+    color: #8a7e74;
+  }
+
+  .header-current .header-temp {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c2520;
+  }
+
+  .header-current .header-sep {
+    color: #d4cdc6;
+  }
+
   .loc-text {
     font-size: 0.82rem;
     color: #8a7e74;
@@ -241,18 +262,11 @@ function getHTML(): string {
     box-shadow: 0 1px 2px rgba(0,0,0,0.08);
   }
 
-  /* Dashboard grid: current + recommendation side by side */
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
   .card {
     background: #fff;
     border-radius: 12px;
     padding: 16px 18px;
+    margin-bottom: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
 
@@ -264,38 +278,6 @@ function getHTML(): string {
     margin-bottom: 10px;
     font-weight: 600;
   }
-
-  .current-temp {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: #2c2520;
-    line-height: 1.1;
-  }
-
-  .current-details {
-    display: flex;
-    gap: 12px;
-    margin-top: 6px;
-    font-size: 0.85rem;
-    color: #8a7e74;
-  }
-
-  .current-rating {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-  }
-
-  .rating-excellent { background: #00b894; color: #fff; }
-  .rating-good { background: #00cec9; color: #fff; }
-  .rating-fair { background: #fdcb6e; color: #2c2520; }
-  .rating-poor { background: #e8e3de; color: #8a7e74; }
-  .rating-unknown { background: #e8e3de; color: #8a7e74; }
 
   .recommendation-box {
     display: flex;
@@ -515,14 +497,14 @@ function getHTML(): string {
   }
 
   #content .map-container,
-  #content .dashboard-grid,
+  #content #recommendation-card,
   #content .forecast-card,
   #content .how-it-works {
     animation: fadeSlideIn 0.45s ease-out both;
   }
 
   #content .map-container { animation-delay: 0s; }
-  #content .dashboard-grid { animation-delay: 0.08s; }
+  #content #recommendation-card { animation-delay: 0.08s; }
   #content .forecast-card { animation-delay: 0.16s; }
   #content .how-it-works { animation-delay: 0.24s; }
 
@@ -546,17 +528,6 @@ function getHTML(): string {
     background: #f0ece7;
     transform: scale(1.01);
     box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-  }
-
-  /* Rating badge pop-in */
-  @keyframes popIn {
-    0% { transform: scale(0); opacity: 0; }
-    70% { transform: scale(1.15); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  .current-rating {
-    animation: popIn 0.35s ease-out 0.35s both;
   }
 
   /* Maple leaf header decoration */
@@ -594,7 +565,6 @@ function getHTML(): string {
   }
 
   @media (max-width: 680px) {
-    .dashboard-grid { grid-template-columns: 1fr; }
     .forecast-day { flex-wrap: wrap; gap: 4px; }
     .forecast-day .temps { min-width: auto; }
     .container { padding: 16px 12px; }
@@ -612,6 +582,11 @@ function getHTML(): string {
         <button id="btn-c" class="active" onclick="setUnit('C')">°C</button>
         <button id="btn-f" onclick="setUnit('F')">°F</button>
       </div>
+    </div>
+    <div class="header-current" id="header-current" style="display:none;">
+      <span class="header-temp" id="current-temp"></span>
+      <span class="header-sep">&middot;</span>
+      <span id="current-summary"></span>
     </div>
   </header>
 
@@ -639,23 +614,9 @@ function getHTML(): string {
           scrolling="no"></iframe>
       </div>
 
-      <div class="dashboard-grid">
-        <div class="card" id="current-card">
-          <h2>Right Now</h2>
-          <div class="current-temp" id="current-temp"></div>
-          <div class="current-details">
-            <span id="current-summary"></span>
-            <span id="today-hilo"></span>
-          </div>
-          <div>
-            <span class="current-rating" id="today-rating"></span>
-          </div>
-        </div>
-
-        <div class="card" id="recommendation-card">
-          <h2>Best Tapping Window</h2>
-          <div id="recommendation"></div>
-        </div>
+      <div class="card" id="recommendation-card">
+        <h2>Best Tapping Window</h2>
+        <div id="recommendation"></div>
       </div>
 
       <div class="card forecast-card">
@@ -772,18 +733,10 @@ function getHTML(): string {
     if (!forecastData) return;
     const d = forecastData;
 
-    // Current conditions
+    // Current conditions (in header)
     document.getElementById('current-temp').textContent = tempStr(d.current.temperature);
     document.getElementById('current-summary').textContent = d.current.summary;
-
-    if (d.today) {
-      document.getElementById('today-hilo').textContent =
-        'H: ' + tempStr(d.today.tempHigh) + '  L: ' + tempStr(d.today.tempLow);
-
-      const ratingEl = document.getElementById('today-rating');
-      ratingEl.textContent = ratingLabel(d.today.rating);
-      ratingEl.className = 'current-rating rating-' + d.today.rating;
-    }
+    document.getElementById('header-current').style.display = 'flex';
 
     // Recommendation
     const recEl = document.getElementById('recommendation');
