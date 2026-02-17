@@ -147,66 +147,98 @@ function getHTML(): string {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tapping Time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f0f4f3;
-    color: #2d3436;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f5f0eb;
+    color: #2c2520;
     line-height: 1.5;
     min-height: 100vh;
   }
 
   .container {
-    max-width: 640px;
+    max-width: 880px;
     margin: 0 auto;
-    padding: 24px 16px;
+    padding: 20px 16px;
   }
 
   header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
 
   header h1 {
-    font-size: 1.8rem;
-    color: #6b4226;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #5C3D2E;
+    letter-spacing: -0.02em;
   }
 
   header p {
-    color: #636e72;
-    font-size: 0.95rem;
-    margin-top: 4px;
+    color: #8a7e74;
+    font-size: 0.9rem;
+    margin-top: 2px;
   }
 
-  .location-bar {
+  .header-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    border-radius: 10px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
   }
 
-  .location-bar .loc-text {
-    font-size: 0.9rem;
-    color: #636e72;
+  .header-current {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 0.88rem;
+    color: #8a7e74;
+  }
+
+  .header-current .header-temp {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c2520;
+  }
+
+  .header-current .header-sep {
+    color: #d4cdc6;
+  }
+
+  .loc-text {
+    font-size: 0.82rem;
+    color: #8a7e74;
+    font-weight: 500;
   }
 
   .map-container {
-    margin-bottom: 16px;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    height: 100px;
+    margin-bottom: 12px;
+    pointer-events: none;
+  }
+
+  .map-container iframe {
+    border-radius: 10px;
+    display: block;
   }
 
   .unit-toggle {
     display: flex;
-    gap: 4px;
-    background: #f0f4f3;
+    gap: 2px;
+    background: #f5f0eb;
     border-radius: 6px;
     padding: 2px;
   }
@@ -217,103 +249,82 @@ function getHTML(): string {
     padding: 4px 10px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 0.85rem;
-    color: #636e72;
+    font-family: inherit;
+    font-size: 0.82rem;
+    color: #8a7e74;
+    font-weight: 500;
     transition: all 0.15s;
   }
 
   .unit-toggle button.active {
     background: #fff;
-    color: #2d3436;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    color: #2c2520;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
   }
 
   .card {
     background: #fff;
     border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   }
 
   .card h2 {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #636e72;
-    margin-bottom: 12px;
-  }
-
-  .current-temp {
-    font-size: 2.4rem;
-    font-weight: 700;
-    color: #2d3436;
-  }
-
-  .current-details {
-    display: flex;
-    gap: 16px;
-    margin-top: 8px;
-    font-size: 0.9rem;
-    color: #636e72;
-  }
-
-  .current-rating {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    color: #8a7e74;
+    margin-bottom: 10px;
     font-weight: 600;
   }
-
-  .rating-excellent { background: #00b894; color: #fff; }
-  .rating-good { background: #00cec9; color: #fff; }
-  .rating-fair { background: #fdcb6e; color: #2d3436; }
-  .rating-poor { background: #dfe6e9; color: #636e72; }
-  .rating-unknown { background: #dfe6e9; color: #636e72; }
 
   .recommendation-box {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
+    gap: 10px;
+    padding: 14px;
     border-radius: 10px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
   }
 
   .recommendation-box .rec-icon {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     flex-shrink: 0;
   }
 
   .rec-tap_now { background: #d4edda; }
   .rec-upcoming { background: #fff3cd; }
-  .rec-no_window { background: #f0f4f3; }
+  .rec-no_window { background: #f5f0eb; }
   .rec-season_over { background: #fde8e8; }
   .rec-too_cold { background: #e8f0fd; }
+
+  .forecast-card {
+    margin-bottom: 12px;
+  }
 
   .forecast-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .forecast-day {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
-    background: #f8f9fa;
+    padding: 8px 12px;
+    background: #faf8f6;
     border-radius: 8px;
-    font-size: 0.9rem;
-    border-left: 4px solid transparent;
+    font-size: 0.85rem;
+    border-left: 3px solid transparent;
   }
 
   .forecast-day.excellent { border-left-color: #00b894; }
   .forecast-day.good { border-left-color: #00cec9; }
   .forecast-day.fair { border-left-color: #fdcb6e; }
-  .forecast-day.poor { border-left-color: #dfe6e9; }
+  .forecast-day.poor { border-left-color: #e8e3de; }
 
   .forecast-day .day-name {
     font-weight: 600;
@@ -321,13 +332,13 @@ function getHTML(): string {
   }
 
   .forecast-day .temps {
-    color: #636e72;
+    color: #8a7e74;
     min-width: 120px;
   }
 
   .forecast-day .day-rating {
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.03em;
     min-width: 70px;
@@ -339,36 +350,42 @@ function getHTML(): string {
   .day-rating.fair { color: #e17055; }
   .day-rating.poor { color: #b2bec3; }
 
+  .how-it-works {
+    margin-bottom: 12px;
+  }
+
   .how-it-works h3 {
-    font-size: 0.95rem;
-    margin-bottom: 8px;
-    color: #6b4226;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #5C3D2E;
+    font-weight: 600;
   }
 
   .how-it-works p, .how-it-works li {
-    font-size: 0.88rem;
-    color: #636e72;
-    margin-bottom: 6px;
+    font-size: 0.84rem;
+    color: #8a7e74;
+    margin-bottom: 4px;
   }
 
   .how-it-works ul {
-    padding-left: 20px;
+    padding-left: 18px;
   }
 
   footer {
-    margin-top: 32px;
-    padding: 20px 0;
-    border-top: 1px solid #dfe6e9;
-    font-size: 0.82rem;
-    color: #636e72;
+    margin-top: 24px;
+    padding: 16px 0;
+    border-top: 1px solid #e8e3de;
+    font-size: 0.78rem;
+    color: #8a7e74;
   }
 
   footer h2 {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #6b4226;
-    margin-bottom: 12px;
+    letter-spacing: 0.06em;
+    color: #5C3D2E;
+    margin-bottom: 10px;
+    font-weight: 600;
   }
 
   footer ul {
@@ -377,12 +394,12 @@ function getHTML(): string {
   }
 
   footer li {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     line-height: 1.4;
   }
 
   footer a {
-    color: #6b4226;
+    color: #5C3D2E;
     text-decoration: none;
   }
 
@@ -391,9 +408,9 @@ function getHTML(): string {
   }
 
   footer .footer-note {
-    margin-top: 16px;
-    font-size: 0.78rem;
-    color: #b2bec3;
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: #b5ada5;
   }
 
   .loading, .error-state {
@@ -403,20 +420,47 @@ function getHTML(): string {
 
   .loading p {
     margin-top: 16px;
-    color: #636e72;
+    color: #8a7e74;
   }
 
-  .spinner {
-    width: 36px;
-    height: 36px;
-    border: 3px solid #dfe6e9;
-    border-top-color: #6b4226;
+  .sap-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sap-loader .leaf {
+    font-size: 2.2rem;
+    animation: leafBob 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(92,61,46,0.2));
+  }
+
+  .sap-loader .drops {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .sap-loader .drop {
+    width: 6px;
+    height: 6px;
+    background: #C67A3C;
     border-radius: 50%;
-    margin: 0 auto;
-    animation: spin 0.8s linear infinite;
+    animation: sapDrop 1.2s ease-in-out infinite;
   }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .sap-loader .drop:nth-child(2) { animation-delay: 0.2s; }
+  .sap-loader .drop:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes leafBob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-6px) rotate(5deg); }
+  }
+
+  @keyframes sapDrop {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
 
   .error-state p {
     color: #d63031;
@@ -425,28 +469,105 @@ function getHTML(): string {
 
   .error-state button {
     padding: 8px 20px;
-    background: #6b4226;
+    background: #5C3D2E;
     color: #fff;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
   }
 
   .window-dates {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     margin-bottom: 2px;
   }
 
   .window-detail {
-    font-size: 0.88rem;
-    color: #636e72;
+    font-size: 0.84rem;
+    color: #8a7e74;
   }
 
-  @media (max-width: 480px) {
+  /* Staggered content reveal */
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  #content .map-container,
+  #content #recommendation-card,
+  #content .forecast-card,
+  #content .how-it-works {
+    animation: fadeSlideIn 0.45s ease-out both;
+  }
+
+  #content .map-container { animation-delay: 0s; }
+  #content #recommendation-card { animation-delay: 0.08s; }
+  #content .forecast-card { animation-delay: 0.16s; }
+  #content .how-it-works { animation-delay: 0.24s; }
+
+  /* Card hover lift */
+  .card {
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    box-shadow: 0 6px 16px rgba(92,61,46,0.1);
+    transform: translateY(-2px);
+  }
+
+  /* Forecast row hover */
+  .forecast-day {
+    transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+    cursor: default;
+  }
+
+  .forecast-day:hover {
+    background: #f0ece7;
+    transform: scale(1.01);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+
+  /* Maple leaf header decoration */
+  header h1::before {
+    content: '\\1F341';
+    display: inline-block;
+    margin-right: 6px;
+    font-size: 1.5rem;
+    vertical-align: middle;
+    animation: leafSway 3s ease-in-out infinite;
+  }
+
+  @keyframes leafSway {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(8deg); }
+  }
+
+  /* Unit toggle hover */
+  .unit-toggle button:not(.active):hover {
+    color: #5C3D2E;
+    background: rgba(255,255,255,0.5);
+  }
+
+  /* Error button interaction */
+  .error-state button {
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .error-state button:hover {
+    background: #7B5440;
+  }
+
+  .error-state button:active {
+    transform: scale(0.97);
+  }
+
+  @media (max-width: 680px) {
     .forecast-day { flex-wrap: wrap; gap: 4px; }
     .forecast-day .temps { min-width: auto; }
+    .container { padding: 16px 12px; }
   }
 </style>
 </head>
@@ -454,12 +575,31 @@ function getHTML(): string {
 <div class="container">
   <header>
     <h1>Tapping Time</h1>
-    <p>When should I tap my maple tree?</p>
+    <p>Your maple sap forecast</p>
+    <div class="header-bar" id="header-bar" style="display:none;">
+      <span class="loc-text" id="loc-text"></span>
+      <div class="unit-toggle">
+        <button id="btn-c" class="active" onclick="setUnit('C')">°C</button>
+        <button id="btn-f" onclick="setUnit('F')">°F</button>
+      </div>
+    </div>
+    <div class="header-current" id="header-current" style="display:none;">
+      <span class="header-temp" id="current-temp"></span>
+      <span class="header-sep">&middot;</span>
+      <span id="current-summary"></span>
+    </div>
   </header>
 
   <div id="app">
     <div class="loading" id="loading">
-      <div class="spinner"></div>
+      <div class="sap-loader">
+        <div class="leaf">&#x1F341;</div>
+        <div class="drops">
+          <div class="drop"></div>
+          <div class="drop"></div>
+          <div class="drop"></div>
+        </div>
+      </div>
       <p>Detecting your location...</p>
     </div>
 
@@ -469,29 +609,9 @@ function getHTML(): string {
     </div>
 
     <div id="content" style="display:none;">
-      <div class="location-bar">
-        <span class="loc-text" id="loc-text">Locating...</span>
-        <div class="unit-toggle">
-          <button id="btn-c" class="active" onclick="setUnit('C')">°C</button>
-          <button id="btn-f" onclick="setUnit('F')">°F</button>
-        </div>
-      </div>
-
       <div class="map-container" id="map-container" style="display:none;">
-        <iframe id="map-frame" width="100%" height="150" frameborder="0"
-          scrolling="no" style="border-radius:10px;"></iframe>
-      </div>
-
-      <div class="card" id="current-card">
-        <h2>Right Now</h2>
-        <div class="current-temp" id="current-temp"></div>
-        <div class="current-details">
-          <span id="current-summary"></span>
-          <span id="today-hilo"></span>
-        </div>
-        <div>
-          <span class="current-rating" id="today-rating"></span>
-        </div>
+        <iframe id="map-frame" width="100%" height="100%" frameborder="0"
+          scrolling="no"></iframe>
       </div>
 
       <div class="card" id="recommendation-card">
@@ -499,7 +619,7 @@ function getHTML(): string {
         <div id="recommendation"></div>
       </div>
 
-      <div class="card">
+      <div class="card forecast-card">
         <h2>7-Day Forecast</h2>
         <div class="forecast-list" id="forecast-list"></div>
       </div>
@@ -613,18 +733,10 @@ function getHTML(): string {
     if (!forecastData) return;
     const d = forecastData;
 
-    // Current conditions
+    // Current conditions (in header)
     document.getElementById('current-temp').textContent = tempStr(d.current.temperature);
     document.getElementById('current-summary').textContent = d.current.summary;
-
-    if (d.today) {
-      document.getElementById('today-hilo').textContent =
-        'H: ' + tempStr(d.today.tempHigh) + '  L: ' + tempStr(d.today.tempLow);
-
-      const ratingEl = document.getElementById('today-rating');
-      ratingEl.textContent = ratingLabel(d.today.rating);
-      ratingEl.className = 'current-rating rating-' + d.today.rating;
-    }
+    document.getElementById('header-current').style.display = 'flex';
 
     // Recommendation
     const recEl = document.getElementById('recommendation');
@@ -690,6 +802,7 @@ function getHTML(): string {
       forecastData = await resp.json();
       document.getElementById('loc-text').textContent =
         lat.toFixed(1) + ', ' + lon.toFixed(1);
+      document.getElementById('header-bar').style.display = 'flex';
 
       var delta = 0.05;
       var bbox = (lon - delta) + ',' + (lat - delta) + ',' +
