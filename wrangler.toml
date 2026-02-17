@@ -1,0 +1,8 @@
+name = "tapping-time"
+main = "src/index.js"
+compatibility_date = "2024-12-01"
+
+[[kv_namespaces]]
+binding = "FORECAST_CACHE"
+id = "<namespace-id>"
+preview_id = "<preview-namespace-id>"
