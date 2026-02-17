@@ -169,7 +169,7 @@ function getHTML(): string {
 
   header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
 
   header h1 {
@@ -186,28 +186,16 @@ function getHTML(): string {
     margin-top: 2px;
   }
 
-  /* Location + Map combined row */
-  .location-section {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-    align-items: stretch;
-  }
-
-  .location-info {
+  .header-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    border-radius: 10px;
-    padding: 10px 14px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    flex: 1;
-    min-height: 48px;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
   }
 
   .loc-text {
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     color: #8a7e74;
     font-weight: 500;
   }
@@ -216,9 +204,9 @@ function getHTML(): string {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    width: 240px;
-    height: 120px;
-    flex-shrink: 0;
+    height: 100px;
+    margin-bottom: 12px;
+    pointer-events: none;
   }
 
   .map-container iframe {
@@ -526,14 +514,14 @@ function getHTML(): string {
     to { opacity: 1; transform: translateY(0); }
   }
 
-  #content .location-section,
+  #content .map-container,
   #content .dashboard-grid,
   #content .forecast-card,
   #content .how-it-works {
     animation: fadeSlideIn 0.45s ease-out both;
   }
 
-  #content .location-section { animation-delay: 0s; }
+  #content .map-container { animation-delay: 0s; }
   #content .dashboard-grid { animation-delay: 0.08s; }
   #content .forecast-card { animation-delay: 0.16s; }
   #content .how-it-works { animation-delay: 0.24s; }
@@ -605,18 +593,7 @@ function getHTML(): string {
     transform: scale(0.97);
   }
 
-  /* Location info hover */
-  .location-info {
-    transition: box-shadow 0.2s;
-  }
-
-  .location-info:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-
   @media (max-width: 680px) {
-    .location-section { flex-direction: column; }
-    .map-container { width: 100%; height: 140px; }
     .dashboard-grid { grid-template-columns: 1fr; }
     .forecast-day { flex-wrap: wrap; gap: 4px; }
     .forecast-day .temps { min-width: auto; }
@@ -628,7 +605,14 @@ function getHTML(): string {
 <div class="container">
   <header>
     <h1>Tapping Time</h1>
-    <p>Your maple sap flow forecast</p>
+    <p>Your maple sap forecast</p>
+    <div class="header-bar" id="header-bar" style="display:none;">
+      <span class="loc-text" id="loc-text"></span>
+      <div class="unit-toggle">
+        <button id="btn-c" class="active" onclick="setUnit('C')">°C</button>
+        <button id="btn-f" onclick="setUnit('F')">°F</button>
+      </div>
+    </div>
   </header>
 
   <div id="app">
@@ -650,18 +634,9 @@ function getHTML(): string {
     </div>
 
     <div id="content" style="display:none;">
-      <div class="location-section">
-        <div class="location-info">
-          <span class="loc-text" id="loc-text">Locating...</span>
-          <div class="unit-toggle">
-            <button id="btn-c" class="active" onclick="setUnit('C')">°C</button>
-            <button id="btn-f" onclick="setUnit('F')">°F</button>
-          </div>
-        </div>
-        <div class="map-container" id="map-container" style="display:none;">
-          <iframe id="map-frame" width="100%" height="100%" frameborder="0"
-            scrolling="no"></iframe>
-        </div>
+      <div class="map-container" id="map-container" style="display:none;">
+        <iframe id="map-frame" width="100%" height="100%" frameborder="0"
+          scrolling="no"></iframe>
       </div>
 
       <div class="dashboard-grid">
@@ -874,6 +849,7 @@ function getHTML(): string {
       forecastData = await resp.json();
       document.getElementById('loc-text').textContent =
         lat.toFixed(1) + ', ' + lon.toFixed(1);
+      document.getElementById('header-bar').style.display = 'flex';
 
       var delta = 0.05;
       var bbox = (lon - delta) + ',' + (lat - delta) + ',' +
