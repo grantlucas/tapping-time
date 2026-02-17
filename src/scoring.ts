@@ -121,20 +121,32 @@ export function generateRecommendation(days: ForecastDay[], bestWindow: BestWind
   const startDate = bestWindow.start;
   const isToday = startDate === days[0].date;
   const len = bestWindow.days.length;
+
+  // Single-day windows: not enough for a productive sap run
+  if (len === 1) {
+    const when = isToday ? 'today' : `coming ${formatDate(startDate)}`;
+    return {
+      type: 'no_window',
+      message: `Only a brief 1-day window ${when} — longer freeze-thaw runs produce much better sap flow.`
+    };
+  }
+
   const avgScore = bestWindow.totalScore / len;
   const quality = avgScore >= 2.5 ? 'excellent' : 'good';
 
   if (isToday) {
+    const stretch = len >= 3 ? ' Great stretch for strong sap flow.' : '';
     return {
       type: 'tap_now',
-      message: `Tap now — ${quality} conditions for the next ${len} day${len > 1 ? 's' : ''}.`
+      message: `Tap now — ${quality} conditions for the next ${len} days.${stretch}`
     };
   }
 
   const startFormatted = formatDate(startDate);
+  const windowQuality = len >= 3 ? 'Great' : 'Good';
   return {
     type: 'upcoming',
-    message: `Good window coming ${startFormatted} — ${len} day${len > 1 ? 's' : ''} of favorable conditions.`
+    message: `${windowQuality} window coming ${startFormatted} — ${len} days of favorable conditions.`
   };
 }
 

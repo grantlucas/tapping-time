@@ -252,20 +252,61 @@ describe('generateRecommendation', () => {
       expect(rec.message).toContain('good');
     });
 
-    it('uses singular "day" for a 1-day window', () => {
+    it('mentions great stretch for 3+ day window starting today', () => {
+      const days = [
+        day('2026-02-17', -5, 7),
+        day('2026-02-18', -4, 6),
+        day('2026-02-19', -3, 5),
+        day('2026-02-20', 3, 10),
+      ];
+      const bestWindow = findBestWindow(days);
+      const rec = generateRecommendation(days, bestWindow);
+      expect(rec.type).toBe('tap_now');
+      expect(rec.message).toContain('Great stretch');
+    });
+
+    it('does not mention great stretch for 2-day window', () => {
+      const days = [
+        day('2026-02-17', -10, 6),  // good (2)
+        day('2026-02-18', -10, 6),  // good (2)
+        day('2026-02-19', 3, 10),   // poor
+      ];
+      const bestWindow = findBestWindow(days);
+      const rec = generateRecommendation(days, bestWindow);
+      expect(rec.type).toBe('tap_now');
+      expect(rec.message).not.toContain('Great stretch');
+    });
+  });
+
+  describe('1-day window — too brief to recommend tapping', () => {
+    it('returns no_window for a single good day starting today', () => {
       const days = [
         day('2026-02-17', -5, 7),   // excellent
         day('2026-02-18', 3, 10),   // poor
       ];
       const bestWindow = findBestWindow(days);
       const rec = generateRecommendation(days, bestWindow);
-      expect(rec.type).toBe('tap_now');
-      expect(rec.message).toMatch(/1 day\b/);
+      expect(rec.type).toBe('no_window');
+      expect(rec.message).toContain('1-day window');
+      expect(rec.message).toContain('today');
+    });
+
+    it('returns no_window for a single good day in the future', () => {
+      const days = [
+        day('2026-02-17', 3, 10),   // poor
+        day('2026-02-18', -5, 7),   // excellent
+        day('2026-02-19', 3, 10),   // poor
+      ];
+      const bestWindow = findBestWindow(days);
+      const rec = generateRecommendation(days, bestWindow);
+      expect(rec.type).toBe('no_window');
+      expect(rec.message).toContain('1-day window');
+      expect(rec.message).toContain('coming');
     });
   });
 
   describe('upcoming — best window starts in the future', () => {
-    it('recommends an upcoming window', () => {
+    it('says "Good window" for a 2-day upcoming window', () => {
       const days = [
         day('2026-02-17', 3, 10),    // poor
         day('2026-02-18', -5, 7),     // excellent
@@ -277,6 +318,21 @@ describe('generateRecommendation', () => {
       expect(rec.type).toBe('upcoming');
       expect(rec.message).toContain('Good window coming');
       expect(rec.message).toContain('2 days');
+    });
+
+    it('says "Great window" for a 3+ day upcoming window', () => {
+      const days = [
+        day('2026-02-17', 3, 10),    // poor
+        day('2026-02-18', -5, 7),     // excellent
+        day('2026-02-19', -4, 6),     // excellent
+        day('2026-02-20', -3, 5),     // excellent
+        day('2026-02-21', 3, 10),     // poor
+      ];
+      const bestWindow = findBestWindow(days);
+      const rec = generateRecommendation(days, bestWindow);
+      expect(rec.type).toBe('upcoming');
+      expect(rec.message).toContain('Great window coming');
+      expect(rec.message).toContain('3 days');
     });
   });
 
