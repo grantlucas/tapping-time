@@ -241,7 +241,9 @@ function getHTML(): string {
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Outfit:wght@400;500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -273,7 +275,7 @@ function getHTML(): string {
   }
 
   header p {
-    color: #8a7e74;
+    color: #6d6157;
     font-size: 0.9rem;
     margin-top: 2px;
   }
@@ -293,7 +295,7 @@ function getHTML(): string {
     gap: 8px;
     margin-top: 6px;
     font-size: 0.88rem;
-    color: #8a7e74;
+    color: #6d6157;
   }
 
   .header-current .header-temp {
@@ -309,7 +311,7 @@ function getHTML(): string {
 
   .loc-text {
     font-size: 0.82rem;
-    color: #8a7e74;
+    color: #6d6157;
     font-weight: 500;
   }
 
@@ -343,7 +345,7 @@ function getHTML(): string {
     cursor: pointer;
     font-family: inherit;
     font-size: 0.82rem;
-    color: #8a7e74;
+    color: #6d6157;
     font-weight: 500;
     transition: all 0.15s;
   }
@@ -366,7 +368,7 @@ function getHTML(): string {
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #8a7e74;
+    color: #6d6157;
     margin-bottom: 10px;
     font-weight: 600;
   }
@@ -424,7 +426,7 @@ function getHTML(): string {
   }
 
   .forecast-day .temps {
-    color: #8a7e74;
+    color: #6d6157;
     min-width: 120px;
   }
 
@@ -437,10 +439,10 @@ function getHTML(): string {
     text-align: right;
   }
 
-  .day-rating.excellent { color: #00b894; }
-  .day-rating.good { color: #00cec9; }
-  .day-rating.fair { color: #e17055; }
-  .day-rating.poor { color: #b2bec3; }
+  .day-rating.excellent { color: #007a56; }
+  .day-rating.good { color: #008380; }
+  .day-rating.fair { color: #c24726; }
+  .day-rating.poor { color: #6b7a82; }
 
   .how-it-works {
     margin-bottom: 12px;
@@ -455,7 +457,7 @@ function getHTML(): string {
 
   .how-it-works p, .how-it-works li {
     font-size: 0.84rem;
-    color: #8a7e74;
+    color: #6d6157;
     margin-bottom: 4px;
   }
 
@@ -476,7 +478,7 @@ function getHTML(): string {
 
   .tapping-guides p, .tapping-guides li {
     font-size: 0.84rem;
-    color: #8a7e74;
+    color: #6d6157;
     margin-bottom: 4px;
   }
 
@@ -486,11 +488,13 @@ function getHTML(): string {
 
   .tapping-guides a {
     color: #5C3D2E;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   .tapping-guides a:hover {
     text-decoration: underline;
+    text-decoration-thickness: 2px;
   }
 
   footer {
@@ -498,7 +502,7 @@ function getHTML(): string {
     padding: 16px 0;
     border-top: 1px solid #e8e3de;
     font-size: 0.78rem;
-    color: #8a7e74;
+    color: #6d6157;
   }
 
   footer h2 {
@@ -522,17 +526,19 @@ function getHTML(): string {
 
   footer a {
     color: #5C3D2E;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   footer a:hover {
     text-decoration: underline;
+    text-decoration-thickness: 2px;
   }
 
   footer .footer-note {
     margin-top: 12px;
     font-size: 0.75rem;
-    color: #b5ada5;
+    color: #6d6157;
   }
 
   .loading, .error-state {
@@ -542,7 +548,7 @@ function getHTML(): string {
 
   .loading p {
     margin-top: 16px;
-    color: #8a7e74;
+    color: #6d6157;
   }
 
   .sap-loader {
@@ -609,7 +615,7 @@ function getHTML(): string {
 
   .window-detail {
     font-size: 0.84rem;
-    color: #8a7e74;
+    color: #6d6157;
   }
 
   /* Staggered content reveal */
@@ -645,7 +651,7 @@ function getHTML(): string {
 
   .noscript-notice p:last-child {
     margin-bottom: 0;
-    color: #8a7e74;
+    color: #6d6157;
   }
 
   /* Card hover lift */
@@ -773,7 +779,7 @@ function getHTML(): string {
       <div id="forecast-results" style="display:none;">
         <div class="map-container" id="map-container" style="display:none;">
           <iframe id="map-frame" width="100%" height="100%" frameborder="0"
-            scrolling="no" loading="lazy"></iframe>
+            scrolling="no" loading="lazy" title="Map showing your location"></iframe>
         </div>
 
         <div class="card" id="recommendation-card">
@@ -1055,7 +1061,11 @@ function getHTML(): string {
     getLocation();
   };
 
-  getLocation();
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(getLocation, { timeout: 2000 });
+  } else {
+    setTimeout(getLocation, 1000);
+  }
 })();
 </script>
 </body>
@@ -1070,6 +1080,15 @@ export default {
 
     if (url.pathname === '/api/forecast') {
       return handleForecast(request, env);
+    }
+
+    if (url.pathname === '/robots.txt') {
+      return new Response('User-agent: *\nAllow: /\n', {
+        headers: {
+          'Content-Type': 'text/plain',
+          'Cache-Control': 'public, max-age=86400',
+        },
+      });
     }
 
     // Serve frontend for all other routes
