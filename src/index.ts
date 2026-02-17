@@ -146,7 +146,99 @@ function getHTML(): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tapping Time</title>
+<title>Tapping Time — Maple Sap Tapping Forecast</title>
+<meta name="description" content="Free maple sap tapping forecast. Uses your location and 7-day weather data to analyze freeze-thaw cycles and recommend the best days to tap sugar maple trees.">
+<meta property="og:title" content="Tapping Time — Maple Sap Tapping Forecast">
+<meta property="og:description" content="Analyze 7-day freeze-thaw cycles to find the best days for tapping sugar maple trees. Free, location-based forecast.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tapping Time — Maple Sap Tapping Forecast">
+<meta name="twitter:description" content="Analyze 7-day freeze-thaw cycles to find the best days for tapping sugar maple trees. Free, location-based forecast.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Tapping Time",
+      "description": "Free maple sap tapping forecast that analyzes 7-day freeze-thaw cycles to recommend the best days to tap sugar maple trees.",
+      "applicationCategory": "WeatherApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    },
+    {
+      "@type": "HowTo",
+      "name": "How to Tap Maple Trees",
+      "description": "A step-by-step guide to tapping sugar maple trees for sap collection and syrup production.",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Choose a tree",
+          "text": "Pick a healthy sugar maple at least 30 cm (12 in) in diameter. A tree 12-18 in diameter supports one tap; larger than 18 in can take two."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Drill the tap hole",
+          "text": "Use a 5/16 or 7/16 inch bit, about 5 cm (2 in) deep at a slight upward angle. Place the tap above a large root or below a large branch on the south-facing side."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Check your shavings",
+          "text": "Light-coloured chips mean healthy sapwood. Dark shavings mean pick a different spot."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Collect sap",
+          "text": "Hang a food-safe, lidded bucket or attach tubing to the spile. Collect sap daily and refrigerate it — sap spoils quickly above freezing."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Boil into syrup",
+          "text": "It takes roughly 40 litres of sap to make 1 litre of syrup. Boil outdoors — the steam will peel wallpaper indoors."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Pull taps at end of season",
+          "text": "Once temperatures stay above freezing consistently or buds appear on branches, pull your spiles. Remove spiles with pliers and let tap holes heal on their own."
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the freeze-thaw cycle for maple sap?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Maple sap flows when nighttime temperatures drop below freezing and daytime temperatures rise above freezing. This creates pressure changes inside the tree that push sap through the tap. Ideal conditions are overnight lows of -7\\u00b0C to -2\\u00b0C with daytime highs of 4\\u00b0C to 10\\u00b0C."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When is the best time to tap maple trees?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The best sap runs happen during extended stretches of freeze-thaw days, typically in late winter to early spring. A single good day produces less sap than a 5-day run of consecutive freeze-thaw cycles."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "When should I stop tapping and pull my spiles?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pull your taps when temperatures stay above freezing consistently (ending the freeze-thaw cycle) or when buds appear on the branches. Budding sap develops an off 'buddy' flavour that won't make good syrup."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -526,19 +618,35 @@ function getHTML(): string {
     to { opacity: 1; transform: translateY(0); }
   }
 
-  #content .map-container,
-  #content #recommendation-card,
-  #content .forecast-card,
-  #content .how-it-works,
-  #content .tapping-guides {
+  #forecast-results .map-container,
+  #forecast-results #recommendation-card,
+  #forecast-results .forecast-card {
     animation: fadeSlideIn 0.45s ease-out both;
   }
 
-  #content .map-container { animation-delay: 0s; }
-  #content #recommendation-card { animation-delay: 0.08s; }
-  #content .forecast-card { animation-delay: 0.16s; }
-  #content .how-it-works { animation-delay: 0.24s; }
-  #content .tapping-guides { animation-delay: 0.32s; }
+  #forecast-results .map-container { animation-delay: 0s; }
+  #forecast-results #recommendation-card { animation-delay: 0.08s; }
+  #forecast-results .forecast-card { animation-delay: 0.16s; }
+
+  .noscript-notice {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid #5C3D2E;
+    font-size: 0.88rem;
+    color: #5C3D2E;
+  }
+
+  .noscript-notice p {
+    margin-bottom: 4px;
+  }
+
+  .noscript-notice p:last-child {
+    margin-bottom: 0;
+    color: #8a7e74;
+  }
 
   /* Card hover lift */
   .card {
@@ -596,6 +704,18 @@ function getHTML(): string {
     transform: scale(0.97);
   }
 
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   @media (max-width: 680px) {
     .forecast-day { flex-wrap: wrap; gap: 4px; }
     .forecast-day .temps { min-width: auto; }
@@ -623,39 +743,53 @@ function getHTML(): string {
   </header>
 
   <div id="app">
-    <div class="loading" id="loading">
-      <div class="sap-loader">
-        <div class="leaf">&#x1F341;</div>
-        <div class="drops">
-          <div class="drop"></div>
-          <div class="drop"></div>
-          <div class="drop"></div>
+    <!-- Dynamic forecast section (progressive enhancement) -->
+    <section id="forecast-section" aria-live="polite">
+      <h2 class="sr-only">Sap Forecast</h2>
+      <noscript>
+        <div class="noscript-notice">
+          <p><strong>JavaScript is required for the live forecast.</strong></p>
+          <p>Enable JavaScript and allow location access to see a personalized 7-day sap forecast. In the meantime, browse the tapping guides and resources below.</p>
+        </div>
+      </noscript>
+
+      <div class="loading" id="loading">
+        <div class="sap-loader">
+          <div class="leaf">&#x1F341;</div>
+          <div class="drops">
+            <div class="drop"></div>
+            <div class="drop"></div>
+            <div class="drop"></div>
+          </div>
+        </div>
+        <p>Detecting your location...</p>
+      </div>
+
+      <div class="error-state" id="error" style="display:none;">
+        <p id="error-msg"></p>
+        <button onclick="retry()">Try again</button>
+      </div>
+
+      <div id="forecast-results" style="display:none;">
+        <div class="map-container" id="map-container" style="display:none;">
+          <iframe id="map-frame" width="100%" height="100%" frameborder="0"
+            scrolling="no" loading="lazy"></iframe>
+        </div>
+
+        <div class="card" id="recommendation-card">
+          <h2>Best Tapping Window</h2>
+          <div id="recommendation"></div>
+        </div>
+
+        <div class="card forecast-card">
+          <h2>7-Day Forecast</h2>
+          <div class="forecast-list" id="forecast-list"></div>
         </div>
       </div>
-      <p>Detecting your location...</p>
-    </div>
+    </section>
 
-    <div class="error-state" id="error" style="display:none;">
-      <p id="error-msg"></p>
-      <button onclick="retry()">Try again</button>
-    </div>
-
-    <div id="content" style="display:none;">
-      <div class="map-container" id="map-container" style="display:none;">
-        <iframe id="map-frame" width="100%" height="100%" frameborder="0"
-          scrolling="no"></iframe>
-      </div>
-
-      <div class="card" id="recommendation-card">
-        <h2>Best Tapping Window</h2>
-        <div id="recommendation"></div>
-      </div>
-
-      <div class="card forecast-card">
-        <h2>7-Day Forecast</h2>
-        <div class="forecast-list" id="forecast-list"></div>
-      </div>
-
+    <!-- Static content (always visible, no JS needed) -->
+    <main>
       <div class="card how-it-works">
         <h2>How It Works</h2>
         <h3>The Freeze-Thaw Cycle</h3>
@@ -708,50 +842,50 @@ function getHTML(): string {
           <li><strong>Store dry:</strong> Keep spiles, buckets, and lids in a dry, dust-free place until next season (<a href="https://vermontevaporator.com/end-of-season-clean-up-pulling-taps-and-flushing-lines/" target="_blank" rel="noopener">Vermont Evaporator Co.</a>).</li>
         </ul>
       </div>
+    </main>
 
-      <footer>
-        <h2>Sources &amp; Further Reading</h2>
-        <ul>
-          <li>
-            Tyree, M.T. (1983). "Maple Sap Uptake, Exudation, and Pressure Changes
-            Correlated with Freezing Exotherms and Thawing Endotherms."
-            <em>Plant Physiology</em>, 73(2), 277–285.
-            <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1066453/" target="_blank" rel="noopener">PMC</a>
-          </li>
-          <li>
-            Rapp, J.M. et al. (2019). "Finding the Sweet Spot: Shifting Optimal
-            Climate for Maple Syrup Production in North America."
-            <em>Forest Ecology and Management</em>.
-            <a href="https://www.sciencedirect.com/science/article/pii/S0378112719303019" target="_blank" rel="noopener">ScienceDirect</a>
-          </li>
-          <li>
-            Graf, I. et al. (2024). "Experimental and Computational Comparison of
-            Freeze–Thaw-Induced Pressure Generation in Red and Sugar Maple."
-            <em>Tree Physiology</em>, 44(4).
-            <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11448476/" target="_blank" rel="noopener">PMC</a>
-          </li>
-          <li>
-            <a href="https://www.uvm.edu/cals/proctor-maple-research-center" target="_blank" rel="noopener">UVM Proctor Maple Research Center</a>
-            — the oldest maple research center in the world (est. 1946)
-          </li>
-          <li>
-            <a href="https://blogs.cornell.edu/cornellmaple/" target="_blank" rel="noopener">Cornell Sugar Maple Research &amp; Extension Program</a>
-            — production research and climate monitoring
-          </li>
-          <li>
-            <a href="https://www.massmaple.org/about-maple-syrup/how-sugar-maple-trees-work/" target="_blank" rel="noopener">Massachusetts Maple Producers Association</a>
-            — how sugar maple trees work
-          </li>
-          <li>
-            <a href="https://umaine.edu/ecologyandenvironmentalsciences/2014/02/19/making-sense-of-maple-syrup/" target="_blank" rel="noopener">University of Maine</a>
-            — making sense of maple syrup
-          </li>
-        </ul>
-        <p class="footer-note">
-          Weather data provided by <a href="https://pirateweather.net/" target="_blank" rel="noopener">Pirate Weather</a>.
-        </p>
-      </footer>
-    </div>
+    <footer>
+      <h2>Sources &amp; Further Reading</h2>
+      <ul>
+        <li>
+          Tyree, M.T. (1983). "Maple Sap Uptake, Exudation, and Pressure Changes
+          Correlated with Freezing Exotherms and Thawing Endotherms."
+          <em>Plant Physiology</em>, 73(2), 277–285.
+          <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1066453/" target="_blank" rel="noopener">PMC</a>
+        </li>
+        <li>
+          Rapp, J.M. et al. (2019). "Finding the Sweet Spot: Shifting Optimal
+          Climate for Maple Syrup Production in North America."
+          <em>Forest Ecology and Management</em>.
+          <a href="https://www.sciencedirect.com/science/article/pii/S0378112719303019" target="_blank" rel="noopener">ScienceDirect</a>
+        </li>
+        <li>
+          Graf, I. et al. (2024). "Experimental and Computational Comparison of
+          Freeze–Thaw-Induced Pressure Generation in Red and Sugar Maple."
+          <em>Tree Physiology</em>, 44(4).
+          <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11448476/" target="_blank" rel="noopener">PMC</a>
+        </li>
+        <li>
+          <a href="https://www.uvm.edu/cals/proctor-maple-research-center" target="_blank" rel="noopener">UVM Proctor Maple Research Center</a>
+          — the oldest maple research center in the world (est. 1946)
+        </li>
+        <li>
+          <a href="https://blogs.cornell.edu/cornellmaple/" target="_blank" rel="noopener">Cornell Sugar Maple Research &amp; Extension Program</a>
+          — production research and climate monitoring
+        </li>
+        <li>
+          <a href="https://www.massmaple.org/about-maple-syrup/how-sugar-maple-trees-work/" target="_blank" rel="noopener">Massachusetts Maple Producers Association</a>
+          — how sugar maple trees work
+        </li>
+        <li>
+          <a href="https://umaine.edu/ecologyandenvironmentalsciences/2014/02/19/making-sense-of-maple-syrup/" target="_blank" rel="noopener">University of Maine</a>
+          — making sense of maple syrup
+        </li>
+      </ul>
+      <p class="footer-note">
+        Weather data provided by <a href="https://pirateweather.net/" target="_blank" rel="noopener">Pirate Weather</a>.
+      </p>
+    </footer>
   </div>
 </div>
 
@@ -844,7 +978,7 @@ function getHTML(): string {
 
   function showError(msg) {
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('content').style.display = 'none';
+    document.getElementById('forecast-results').style.display = 'none';
     document.getElementById('error').style.display = 'block';
     document.getElementById('error-msg').textContent = msg;
   }
@@ -852,7 +986,7 @@ function getHTML(): string {
   function showContent() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
+    document.getElementById('forecast-results').style.display = 'block';
   }
 
   async function fetchForecast(lat, lon) {
