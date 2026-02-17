@@ -196,6 +196,13 @@ function getHTML(): string {
     color: #636e72;
   }
 
+  .map-container {
+    margin-bottom: 16px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
   .unit-toggle {
     display: flex;
     gap: 4px;
@@ -470,6 +477,11 @@ function getHTML(): string {
         </div>
       </div>
 
+      <div class="map-container" id="map-container" style="display:none;">
+        <iframe id="map-frame" width="100%" height="150" frameborder="0"
+          scrolling="no" style="border-radius:10px;"></iframe>
+      </div>
+
       <div class="card" id="current-card">
         <h2>Right Now</h2>
         <div class="current-temp" id="current-temp"></div>
@@ -678,6 +690,15 @@ function getHTML(): string {
       forecastData = await resp.json();
       document.getElementById('loc-text').textContent =
         lat.toFixed(1) + ', ' + lon.toFixed(1);
+
+      var delta = 0.05;
+      var bbox = (lon - delta) + ',' + (lat - delta) + ',' +
+                 (lon + delta) + ',' + (lat + delta);
+      var mapUrl = 'https://www.openstreetmap.org/export/embed.html'
+        + '?bbox=' + bbox + '&layer=mapnik&marker=' + lat + ',' + lon;
+      document.getElementById('map-frame').src = mapUrl;
+      document.getElementById('map-container').style.display = 'block';
+
       showContent();
       render();
     } catch (err) {
