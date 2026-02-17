@@ -317,6 +317,47 @@ function getHTML() {
     padding-left: 20px;
   }
 
+  footer {
+    margin-top: 32px;
+    padding: 20px 0;
+    border-top: 1px solid #dfe6e9;
+    font-size: 0.82rem;
+    color: #636e72;
+  }
+
+  footer h2 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b4226;
+    margin-bottom: 12px;
+  }
+
+  footer ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  footer li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  footer a {
+    color: #6b4226;
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    text-decoration: underline;
+  }
+
+  footer .footer-note {
+    margin-top: 16px;
+    font-size: 0.78rem;
+    color: #b2bec3;
+  }
+
   .loading, .error-state {
     text-align: center;
     padding: 48px 16px;
@@ -438,6 +479,49 @@ function getHTML() {
            single good day produces less sap than a 5-day run. The "Best Tapping Window"
            highlights the longest stretch of good-or-better conditions in the forecast.</p>
       </div>
+
+      <footer>
+        <h2>Sources &amp; Further Reading</h2>
+        <ul>
+          <li>
+            Tyree, M.T. (1983). "Maple Sap Uptake, Exudation, and Pressure Changes
+            Correlated with Freezing Exotherms and Thawing Endotherms."
+            <em>Plant Physiology</em>, 73(2), 277–285.
+            <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC1066453/" target="_blank" rel="noopener">PMC</a>
+          </li>
+          <li>
+            Rapp, J.M. et al. (2019). "Finding the Sweet Spot: Shifting Optimal
+            Climate for Maple Syrup Production in North America."
+            <em>Forest Ecology and Management</em>.
+            <a href="https://www.sciencedirect.com/science/article/pii/S0378112719303019" target="_blank" rel="noopener">ScienceDirect</a>
+          </li>
+          <li>
+            Graf, I. et al. (2024). "Experimental and Computational Comparison of
+            Freeze–Thaw-Induced Pressure Generation in Red and Sugar Maple."
+            <em>Tree Physiology</em>, 44(4).
+            <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11448476/" target="_blank" rel="noopener">PMC</a>
+          </li>
+          <li>
+            <a href="https://www.uvm.edu/cals/proctor-maple-research-center" target="_blank" rel="noopener">UVM Proctor Maple Research Center</a>
+            — the oldest maple research center in the world (est. 1946)
+          </li>
+          <li>
+            <a href="https://blogs.cornell.edu/cornellmaple/" target="_blank" rel="noopener">Cornell Sugar Maple Research &amp; Extension Program</a>
+            — production research and climate monitoring
+          </li>
+          <li>
+            <a href="https://www.massmaple.org/about-maple-syrup/how-sugar-maple-trees-work/" target="_blank" rel="noopener">Massachusetts Maple Producers Association</a>
+            — how sugar maple trees work
+          </li>
+          <li>
+            <a href="https://umaine.edu/ecologyandenvironmentalsciences/2014/02/19/making-sense-of-maple-syrup/" target="_blank" rel="noopener">University of Maine</a>
+            — making sense of maple syrup
+          </li>
+        </ul>
+        <p class="footer-note">
+          Weather data provided by <a href="https://pirateweather.net/" target="_blank" rel="noopener">Pirate Weather</a>.
+        </p>
+      </footer>
     </div>
   </div>
 </div>

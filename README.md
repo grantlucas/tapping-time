@@ -46,3 +46,42 @@ npm run deploy
 - Pirate Weather API (Dark Sky compatible, free tier)
 - Cloudflare KV (forecast caching, 3h TTL)
 - Vanilla HTML/CSS/JS frontend
+
+## Sources & further reading
+
+The scoring model and temperature thresholds are informed by maple sap
+flow research:
+
+### Research papers
+
+- Tyree, M.T. (1983). "Maple Sap Uptake, Exudation, and Pressure
+  Changes Correlated with Freezing Exotherms and Thawing Endotherms."
+  *Plant Physiology*, 73(2), 277–285.
+  [PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC1066453/)
+  — foundational research on the freeze-thaw sap pressure mechanism
+- Rapp, J.M. et al. (2019). "Finding the Sweet Spot: Shifting Optimal
+  Climate for Maple Syrup Production in North America." *Forest Ecology
+  and Management*.
+  [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0378112719303019)
+  — climate change impacts on tapping season timing
+- Graf, I. et al. (2024). "Experimental and Computational Comparison of
+  Freeze–Thaw-Induced Pressure Generation in Red and Sugar Maple."
+  *Tree Physiology*, 44(4).
+  [PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11448476/)
+  — mathematical modeling of sap exudation
+
+### Extension programs & educational resources
+
+- [UVM Proctor Maple Research Center](https://www.uvm.edu/cals/proctor-maple-research-center)
+  — the world's oldest maple research center (est. 1946)
+- [Cornell Sugar Maple Research & Extension Program](https://blogs.cornell.edu/cornellmaple/)
+  — production research and real-time climate monitoring
+- [Massachusetts Maple Producers Association](https://www.massmaple.org/about-maple-syrup/how-sugar-maple-trees-work/)
+  — how sugar maple trees work
+- [University of Maine: Making Sense of Maple Syrup](https://umaine.edu/ecologyandenvironmentalsciences/2014/02/19/making-sense-of-maple-syrup/)
+  — accessible overview of sap flow science
+
+### Weather data
+
+- [Pirate Weather](https://pirateweather.net/) — free, Dark
+  Sky-compatible forecast API
