@@ -371,6 +371,36 @@ function getHTML(): string {
     padding-left: 18px;
   }
 
+  .tapping-guides {
+    margin-bottom: 12px;
+  }
+
+  .tapping-guides h3 {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #5C3D2E;
+    font-weight: 600;
+  }
+
+  .tapping-guides p, .tapping-guides li {
+    font-size: 0.84rem;
+    color: #8a7e74;
+    margin-bottom: 4px;
+  }
+
+  .tapping-guides ul {
+    padding-left: 18px;
+  }
+
+  .tapping-guides a {
+    color: #5C3D2E;
+    text-decoration: none;
+  }
+
+  .tapping-guides a:hover {
+    text-decoration: underline;
+  }
+
   footer {
     margin-top: 24px;
     padding: 16px 0;
@@ -499,7 +529,8 @@ function getHTML(): string {
   #content .map-container,
   #content #recommendation-card,
   #content .forecast-card,
-  #content .how-it-works {
+  #content .how-it-works,
+  #content .tapping-guides {
     animation: fadeSlideIn 0.45s ease-out both;
   }
 
@@ -507,6 +538,7 @@ function getHTML(): string {
   #content #recommendation-card { animation-delay: 0.08s; }
   #content .forecast-card { animation-delay: 0.16s; }
   #content .how-it-works { animation-delay: 0.24s; }
+  #content .tapping-guides { animation-delay: 0.32s; }
 
   /* Card hover lift */
   .card {
@@ -641,6 +673,40 @@ function getHTML(): string {
         <p>The best sap runs happen during extended stretches of freeze-thaw days. A
            single good day produces less sap than a 5-day run. The "Best Tapping Window"
            highlights the longest stretch of good-or-better conditions in the forecast.</p>
+      </div>
+
+      <div class="card tapping-guides">
+        <h2>Tapping Guides</h2>
+        <h3>Choosing &amp; Tapping a Tree</h3>
+        <p>Pick a healthy sugar maple at least 30 cm (12 in) in diameter. Place
+           the tap above a large root or below a large branch on the south-facing
+           side for the earliest flow.</p>
+        <ul>
+          <li><strong>Tree size:</strong> 12–18 in diameter supports one tap; larger than 18 in can take two (<a href="https://vermontevaporator.com/diy-maple-syrup-how-to-tap-2/" target="_blank" rel="noopener">Vermont Evaporator Co.</a>).</li>
+          <li><strong>Drill:</strong> Use a 5/16″ or 7/16″ bit, about 5 cm (2 in) deep at a slight upward angle.</li>
+          <li><strong>Check your shavings:</strong> Light-coloured chips mean healthy sapwood — dark shavings mean pick a different spot (<a href="https://tapmytrees.com/tap-tree/" target="_blank" rel="noopener">Tap My Trees</a>).</li>
+        </ul>
+        <h3>Collecting &amp; Boiling</h3>
+        <p>Hang a food-safe, lidded bucket or attach tubing to the spile. Collect
+           sap daily and refrigerate it — sap spoils quickly above freezing.</p>
+        <ul>
+          <li><strong>Ratio:</strong> It takes roughly 40 litres of sap to make 1 litre of syrup.</li>
+          <li><strong>Boil outdoors:</strong> The steam will peel wallpaper indoors (<a href="https://www.almanac.com/making-maple-syrup-answering-common-questions" target="_blank" rel="noopener">Old Farmer's Almanac</a>).</li>
+        </ul>
+        <h3>When to Pull Your Taps</h3>
+        <p>Without the freeze-thaw cycle, sap flow stops. Watch for these signs
+           that the season is over:</p>
+        <ul>
+          <li><strong>No more freezing nights:</strong> Once temperatures stay above freezing consistently, flow dries up (<a href="https://www.motherearthnews.com/homesteading-and-livestock/end-of-maple-tapping-season-zbcz1503/" target="_blank" rel="noopener">Mother Earth News</a>).</li>
+          <li><strong>Bud break:</strong> Once buds appear on the branches, sap develops an off "buddy" flavour that won't make good syrup. Pull your spiles before buds open.</li>
+        </ul>
+        <h3>End-of-Season Cleanup</h3>
+        <p>Remove spiles with pliers and let tap holes heal on their own — don't
+           plug them.</p>
+        <ul>
+          <li><strong>Clean equipment:</strong> Scrub with dilute bleach (1 part unscented bleach to 20 parts water), then triple-rinse with hot water (<a href="https://tapmytrees.com/cleanup/" target="_blank" rel="noopener">Tap My Trees</a>).</li>
+          <li><strong>Store dry:</strong> Keep spiles, buckets, and lids in a dry, dust-free place until next season (<a href="https://vermontevaporator.com/end-of-season-clean-up-pulling-taps-and-flushing-lines/" target="_blank" rel="noopener">Vermont Evaporator Co.</a>).</li>
+        </ul>
       </div>
 
       <footer>
