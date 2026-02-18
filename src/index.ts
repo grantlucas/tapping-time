@@ -733,7 +733,7 @@ function getHTML(): string {
 <div class="container">
   <header>
     <h1>Sapcast</h1>
-    <p>Your maple sap forecast</p>
+    <p>Ditch the 🔮 — let real forecast data tell you when to tap</p>
     <div class="header-bar" id="header-bar" style="display:none;">
       <span class="loc-text" id="loc-text"></span>
       <div class="unit-toggle">
@@ -890,6 +890,9 @@ function getHTML(): string {
       </ul>
       <p class="footer-note">
         Weather data provided by <a href="https://pirateweather.net/" target="_blank" rel="noopener">Pirate Weather</a>.
+      </p>
+      <p class="footer-note">
+        Built with care for 3 out of 52 weeks per year by <a href="https://grantlucas.com/" target="_blank" rel="noopener">Grant Lucas</a>.
       </p>
     </footer>
   </div>
