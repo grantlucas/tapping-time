@@ -456,6 +456,21 @@ function getHTML(): string {
   .forecast-day .temps {
     color: #6d6157;
     min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .forecast-day .temp-low {
+    text-align: right;
+    min-width: 36px;
+  }
+
+  .forecast-day .temp-arrow {
+    margin: 0 4px;
+  }
+
+  .forecast-day .temp-high {
+    min-width: 36px;
   }
 
   .forecast-day .day-rating {
@@ -1019,7 +1034,7 @@ function getHTML(): string {
       row.className = 'forecast-day ' + day.rating;
       row.innerHTML =
         '<span class="day-name">' + dayName(day.date) + '</span>' +
-        '<span class="temps">' + tempStr(day.tempLow) + ' \u2192 ' + tempStr(day.tempHigh) + '</span>' +
+        '<span class="temps"><span class="temp-low">' + tempStr(day.tempLow) + '</span><span class="temp-arrow">\u2192</span><span class="temp-high">' + tempStr(day.tempHigh) + '</span></span>' +
         '<span class="day-rating ' + day.rating + '">' + ratingLabel(day.rating) + '</span>';
       listEl.appendChild(row);
     });
