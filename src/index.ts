@@ -1,4 +1,4 @@
-// Tapping Time — Cloudflare Worker
+// Sapcast — Cloudflare Worker
 // Serves the frontend and proxies/caches Pirate Weather API requests
 
 import {
@@ -146,13 +146,13 @@ function getHTML(): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tapping Time — Maple Sap Tapping Forecast</title>
+<title>Sapcast — Maple Sap Tapping Forecast</title>
 <meta name="description" content="Free maple sap tapping forecast. Uses your location and 7-day weather data to analyze freeze-thaw cycles and recommend the best days to tap sugar maple trees.">
-<meta property="og:title" content="Tapping Time — Maple Sap Tapping Forecast">
+<meta property="og:title" content="Sapcast — Maple Sap Tapping Forecast">
 <meta property="og:description" content="Analyze 7-day freeze-thaw cycles to find the best days for tapping sugar maple trees. Free, location-based forecast.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Tapping Time — Maple Sap Tapping Forecast">
+<meta name="twitter:title" content="Sapcast — Maple Sap Tapping Forecast">
 <meta name="twitter:description" content="Analyze 7-day freeze-thaw cycles to find the best days for tapping sugar maple trees. Free, location-based forecast.">
 <script type="application/ld+json">
 {
@@ -160,7 +160,7 @@ function getHTML(): string {
   "@graph": [
     {
       "@type": "WebApplication",
-      "name": "Tapping Time",
+      "name": "Sapcast",
       "description": "Free maple sap tapping forecast that analyzes 7-day freeze-thaw cycles to recommend the best days to tap sugar maple trees.",
       "applicationCategory": "WeatherApplication",
       "operatingSystem": "Any",
@@ -732,7 +732,7 @@ function getHTML(): string {
 <body>
 <div class="container">
   <header>
-    <h1>Tapping Time</h1>
+    <h1>Sapcast</h1>
     <p>Your maple sap forecast</p>
     <div class="header-bar" id="header-bar" style="display:none;">
       <span class="loc-text" id="loc-text"></span>

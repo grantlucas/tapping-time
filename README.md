@@ -1,4 +1,4 @@
-# tapping-time
+# Sapcast
 
 Based on local weather forecasts; when should I tap my maple tree?
 

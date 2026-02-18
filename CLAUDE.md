@@ -5,7 +5,7 @@ code in this repository.
 
 ## What This Project Is
 
-Tapping Time is a maple sap tapping advisor. It uses browser geolocation and
+Sapcast is a maple sap tapping advisor. It uses browser geolocation and
 the Pirate Weather API to analyze 7-day freeze-thaw cycles and recommend when
 to tap sugar maple trees. It runs as a Cloudflare Worker (TypeScript, no
 build step — Wrangler handles transpilation).
