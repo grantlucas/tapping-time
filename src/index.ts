@@ -1019,7 +1019,7 @@ function getHTML(): string {
       row.className = 'forecast-day ' + day.rating;
       row.innerHTML =
         '<span class="day-name">' + dayName(day.date) + '</span>' +
-        '<span class="temps">H: ' + tempStr(day.tempHigh) + '  L: ' + tempStr(day.tempLow) + '</span>' +
+        '<span class="temps">' + tempStr(day.tempLow) + ' \u2192 ' + tempStr(day.tempHigh) + '</span>' +
         '<span class="day-rating ' + day.rating + '">' + ratingLabel(day.rating) + '</span>';
       listEl.appendChild(row);
     });
