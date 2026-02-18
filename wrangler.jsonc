@@ -9,6 +9,13 @@
       "preview_id": "5005414a92dc444e8eace3dbc3fefd8f"
     }
   ],
+  "routes": [
+    {
+      "pattern": "sapcast.ca",
+      "custom_domain": true
+    }
+  ],
+  "workers_dev": false,
   "observability": {
     "logs": {
       "enabled": true,
