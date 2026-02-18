@@ -146,6 +146,7 @@ function getHTML(): string {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍁</text></svg>">
 <title>Sapcast — Maple Sap Tapping Forecast</title>
 <meta name="description" content="Free maple sap tapping forecast. Uses your location and 7-day weather data to analyze freeze-thaw cycles and recommend the best days to tap sugar maple trees.">
 <meta property="og:title" content="Sapcast — Maple Sap Tapping Forecast">
