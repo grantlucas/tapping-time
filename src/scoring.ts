@@ -150,6 +150,75 @@ export function generateRecommendation(days: ForecastDay[], bestWindow: BestWind
   };
 }
 
+// ── Season timing ─────────────────────────────────────────────────────────
+
+export interface SeasonInfo {
+  tapByDate: string;
+  seasonEndDate: string;
+  message: string;
+}
+
+interface ReferencePoint {
+  lat: number;
+  tapByDoy: number;
+  seasonEndDoy: number;
+}
+
+export const SEASON_REFERENCE_POINTS: readonly ReferencePoint[] = [
+  { lat: 39, tapByDoy: 45,  seasonEndDoy: 59  }, // Southern OH/PA — ~Feb 14 / Feb 28
+  { lat: 43, tapByDoy: 65,  seasonEndDoy: 79  }, // Wisconsin — ~Mar 6 / Mar 20
+  { lat: 45, tapByDoy: 76,  seasonEndDoy: 90  }, // Vermont/NH — ~Mar 17 / Mar 31
+  { lat: 47, tapByDoy: 94,  seasonEndDoy: 108 }, // Northern ME/Ontario — ~Apr 4 / Apr 18
+  { lat: 49, tapByDoy: 104, seasonEndDoy: 118 }, // Far northern Ontario — ~Apr 14 / Apr 28
+];
+
+export function doyToDate(doy: number, year: number): string {
+  const d = new Date(year, 0, doy);
+  return d.toISOString().split('T')[0];
+}
+
+export function getSeasonInfo(latitude: number, year: number): SeasonInfo {
+  const lat = Math.min(49, Math.max(39, Math.abs(latitude)));
+  const pts = SEASON_REFERENCE_POINTS;
+
+  let tapByDoy: number;
+  let seasonEndDoy: number;
+
+  if (lat <= pts[0].lat) {
+    tapByDoy = pts[0].tapByDoy;
+    seasonEndDoy = pts[0].seasonEndDoy;
+  } else if (lat >= pts[pts.length - 1].lat) {
+    tapByDoy = pts[pts.length - 1].tapByDoy;
+    seasonEndDoy = pts[pts.length - 1].seasonEndDoy;
+  } else {
+    // Find bounding reference points and interpolate
+    let lower = pts[0];
+    let upper = pts[1];
+    for (let i = 0; i < pts.length - 1; i++) {
+      if (lat >= pts[i].lat && lat <= pts[i + 1].lat) {
+        lower = pts[i];
+        upper = pts[i + 1];
+        break;
+      }
+    }
+    const t = (lat - lower.lat) / (upper.lat - lower.lat);
+    tapByDoy = Math.round(lower.tapByDoy + t * (upper.tapByDoy - lower.tapByDoy));
+    seasonEndDoy = Math.round(lower.seasonEndDoy + t * (upper.seasonEndDoy - lower.seasonEndDoy));
+  }
+
+  const tapByDate = doyToDate(tapByDoy, year);
+  const seasonEndDate = doyToDate(seasonEndDoy, year);
+
+  const tapByFormatted = formatDate(tapByDate);
+  const seasonEndFormatted = formatDate(seasonEndDate);
+
+  const message = `Based on your latitude, sap season typically wraps up around ${seasonEndFormatted}. `
+    + `If you haven't seen an ideal window by ${tapByFormatted}, tap your trees anyway — `
+    + `early tapping doesn't reduce yield, and you'll catch any remaining freeze-thaw cycles.`;
+
+  return { tapByDate, seasonEndDate, message };
+}
+
 export function formatDate(dateStr: string): string {
   const d = new Date(dateStr + 'T12:00:00');
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });

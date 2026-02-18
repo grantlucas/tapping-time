@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { scoreDay, findBestWindow, generateRecommendation, formatDate, type ForecastDay } from './scoring';
+import { scoreDay, findBestWindow, generateRecommendation, formatDate, getSeasonInfo, doyToDate, type ForecastDay } from './scoring';
 
 // ── Helper to build a day object for findBestWindow / generateRecommendation ──
 function day(date: string, tempLow: number, tempHigh: number): ForecastDay {
@@ -393,5 +393,122 @@ describe('formatDate', () => {
     expect(result).toMatch(/Sun/);
     expect(result).toMatch(/Mar/);
     expect(result).toMatch(/1/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// doyToDate
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('doyToDate', () => {
+  it('DOY 1 = Jan 1', () => {
+    expect(doyToDate(1, 2026)).toBe('2026-01-01');
+  });
+
+  it('DOY 59 = Feb 28 in a non-leap year', () => {
+    expect(doyToDate(59, 2026)).toBe('2026-02-28');
+  });
+
+  it('DOY 60 = Feb 29 in a leap year', () => {
+    expect(doyToDate(60, 2028)).toBe('2028-02-29');
+  });
+
+  it('DOY 60 = Mar 1 in a non-leap year', () => {
+    expect(doyToDate(60, 2026)).toBe('2026-03-01');
+  });
+
+  it('DOY 365 = Dec 31 in a non-leap year', () => {
+    expect(doyToDate(365, 2026)).toBe('2026-12-31');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// getSeasonInfo
+// ═══════════════════════════════════════════════════════════════════════════
+
+describe('getSeasonInfo', () => {
+  describe('exact reference point matches', () => {
+    it('lat 39 — Southern OH/PA', () => {
+      const info = getSeasonInfo(39, 2026);
+      expect(info.tapByDate).toBe(doyToDate(45, 2026));
+      expect(info.seasonEndDate).toBe(doyToDate(59, 2026));
+    });
+
+    it('lat 45 — Vermont/NH', () => {
+      const info = getSeasonInfo(45, 2026);
+      expect(info.tapByDate).toBe(doyToDate(76, 2026));
+      expect(info.seasonEndDate).toBe(doyToDate(90, 2026));
+    });
+
+    it('lat 49 — Far northern Ontario', () => {
+      const info = getSeasonInfo(49, 2026);
+      expect(info.tapByDate).toBe(doyToDate(104, 2026));
+      expect(info.seasonEndDate).toBe(doyToDate(118, 2026));
+    });
+  });
+
+  describe('interpolation between reference points', () => {
+    it('lat 41 — halfway between 39 and 43', () => {
+      const info = getSeasonInfo(41, 2026);
+      // tapByDoy: 45 + 0.5 * (65-45) = 55
+      expect(info.tapByDate).toBe(doyToDate(55, 2026));
+      // seasonEndDoy: 59 + 0.5 * (79-59) = 69
+      expect(info.seasonEndDate).toBe(doyToDate(69, 2026));
+    });
+
+    it('lat 44 — quarter between 43 and 45', () => {
+      const info = getSeasonInfo(44, 2026);
+      // tapByDoy: 65 + 0.5 * (76-65) = 65 + 5.5 = 71 (rounded)
+      expect(info.tapByDate).toBe(doyToDate(71, 2026));
+      // seasonEndDoy: 79 + 0.5 * (90-79) = 79 + 5.5 = 85 (rounded)
+      expect(info.seasonEndDate).toBe(doyToDate(85, 2026));
+    });
+  });
+
+  describe('clamping', () => {
+    it('clamps latitude below 39 to 39', () => {
+      const info = getSeasonInfo(35, 2026);
+      const ref = getSeasonInfo(39, 2026);
+      expect(info.tapByDate).toBe(ref.tapByDate);
+      expect(info.seasonEndDate).toBe(ref.seasonEndDate);
+    });
+
+    it('clamps latitude above 49 to 49', () => {
+      const info = getSeasonInfo(55, 2026);
+      const ref = getSeasonInfo(49, 2026);
+      expect(info.tapByDate).toBe(ref.tapByDate);
+      expect(info.seasonEndDate).toBe(ref.seasonEndDate);
+    });
+  });
+
+  describe('abs-latitude for southern hemisphere', () => {
+    it('negative latitude uses absolute value', () => {
+      const info = getSeasonInfo(-45, 2026);
+      const ref = getSeasonInfo(45, 2026);
+      expect(info.tapByDate).toBe(ref.tapByDate);
+      expect(info.seasonEndDate).toBe(ref.seasonEndDate);
+    });
+  });
+
+  describe('message content', () => {
+    it('contains key phrases', () => {
+      const info = getSeasonInfo(45, 2026);
+      expect(info.message).toContain('Based on your latitude');
+      expect(info.message).toContain('wraps up around');
+      expect(info.message).toContain('tap your trees anyway');
+      expect(info.message).toContain('early tapping doesn\'t reduce yield');
+    });
+  });
+
+  describe('leap year handling', () => {
+    it('produces valid dates for leap year 2028', () => {
+      const info = getSeasonInfo(45, 2028);
+      // DOY 76 in leap year 2028 = Mar 16 (one day earlier than non-leap)
+      expect(info.tapByDate).toBe(doyToDate(76, 2028));
+      expect(info.seasonEndDate).toBe(doyToDate(90, 2028));
+      // Both should be valid date strings
+      expect(new Date(info.tapByDate + 'T12:00:00').getFullYear()).toBe(2028);
+      expect(new Date(info.seasonEndDate + 'T12:00:00').getFullYear()).toBe(2028);
+    });
   });
 });

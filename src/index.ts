@@ -5,8 +5,10 @@ import {
   scoreDay,
   findBestWindow,
   generateRecommendation,
+  getSeasonInfo,
   type ForecastDay,
   type Rating,
+  type SeasonInfo,
 } from './scoring';
 
 interface Env {
@@ -31,6 +33,7 @@ interface ForecastResult {
     avgScore: number;
   } | null;
   recommendation: { type: string; message: string };
+  seasonInfo: SeasonInfo | null;
   cached: boolean;
 }
 
@@ -115,6 +118,7 @@ async function handleForecast(request: Request, env: Env): Promise<Response> {
   // Find best tapping window and generate recommendation
   const bestWindow = findBestWindow(days);
   const recommendation = generateRecommendation(days, bestWindow);
+  const seasonInfo = getSeasonInfo(lat, new Date().getFullYear());
 
   const result: ForecastResult = {
     current,
@@ -127,6 +131,7 @@ async function handleForecast(request: Request, env: Env): Promise<Response> {
       avgScore: bestWindow.totalScore / bestWindow.days.length,
     } : null,
     recommendation,
+    seasonInfo,
     cached: false,
   };
 
@@ -395,6 +400,28 @@ function getHTML(): string {
   .rec-season_over { background: #fde8e8; }
   .rec-too_cold { background: #e8f0fd; }
 
+  .season-info-box {
+    padding: 14px;
+    border-radius: 10px;
+    background: #f5f0eb;
+    border-left: 3px solid #C67A3C;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .season-info-dates {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: #6d6157;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .season-info-dates strong {
+    color: #5C3D2E;
+  }
+
   .forecast-card {
     margin-bottom: 12px;
   }
@@ -627,13 +654,15 @@ function getHTML(): string {
 
   #forecast-results .map-container,
   #forecast-results #recommendation-card,
+  #forecast-results #season-info-card,
   #forecast-results .forecast-card {
     animation: fadeSlideIn 0.45s ease-out both;
   }
 
   #forecast-results .map-container { animation-delay: 0s; }
   #forecast-results #recommendation-card { animation-delay: 0.08s; }
-  #forecast-results .forecast-card { animation-delay: 0.16s; }
+  #forecast-results #season-info-card { animation-delay: 0.16s; }
+  #forecast-results .forecast-card { animation-delay: 0.24s; }
 
   .noscript-notice {
     background: #fff;
@@ -786,6 +815,11 @@ function getHTML(): string {
         <div class="card" id="recommendation-card">
           <h2>Best Tapping Window</h2>
           <div id="recommendation"></div>
+        </div>
+
+        <div class="card" id="season-info-card" style="display:none;">
+          <h2>Season Timing</h2>
+          <div id="season-info"></div>
         </div>
 
         <div class="card forecast-card">
@@ -964,6 +998,18 @@ function getHTML(): string {
     }
     recHTML += '</div></div>';
     recEl.innerHTML = recHTML;
+
+    // Season info
+    if (d.seasonInfo) {
+      var siEl = document.getElementById('season-info');
+      siEl.innerHTML = '<div class="season-info-box">'
+        + '<div>' + d.seasonInfo.message + '</div>'
+        + '<div class="season-info-dates">'
+        + '<span><strong>Tap by:</strong> ' + dayName(d.seasonInfo.tapByDate) + '</span>'
+        + '<span><strong>Season end:</strong> ' + dayName(d.seasonInfo.seasonEndDate) + '</span>'
+        + '</div></div>';
+      document.getElementById('season-info-card').style.display = '';
+    }
 
     // 7-day forecast
     const listEl = document.getElementById('forecast-list');
