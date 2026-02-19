@@ -808,10 +808,61 @@ ${phSnippet}
     .container { padding: 16px 12px; }
   }
 
-  .feedback-section {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid #e8e3de;
+  .feedback-collapsible {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .feedback-collapsible:hover {
+    box-shadow: 0 6px 16px rgba(92,61,46,0.1);
+    transform: translateY(-2px);
+  }
+
+  .feedback-toggle {
+    padding: 14px 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #5C3D2E;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+  }
+
+  .feedback-toggle::-webkit-details-marker { display: none; }
+
+  .feedback-toggle::after {
+    content: '›';
+    margin-left: auto;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #6d6157;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+
+  details[open] .feedback-toggle::after {
+    transform: rotate(90deg);
+  }
+
+  .feedback-inner {
+    padding: 0 18px 16px;
+  }
+
+  .feedback-callout {
+    font-size: 0.84rem;
+    color: #6d6157;
+    line-height: 1.5;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: #f5f0eb;
+    border-radius: 8px;
+    border-left: 3px solid #C67A3C;
   }
 
   .feedback-prompt {
@@ -982,6 +1033,28 @@ ${phSnippet}
       </div>
     </section>
 
+    <details class="feedback-collapsible">
+      <summary class="feedback-toggle">&#x1F4AC; How are we doing?</summary>
+      <div class="feedback-inner">
+        <p class="feedback-callout">Sapcast is a new project and we&rsquo;re still tuning the forecast model and learning what&rsquo;s actually useful to tappers. Your feedback &mdash; even a quick note &mdash; makes a real difference.</p>
+        <p class="feedback-prompt">Was this forecast helpful?</p>
+        <div id="feedback-form">
+          <div class="feedback-buttons">
+            <button class="feedback-btn" id="fb-helpful" onclick="selectFeedback('helpful')">&#128077; Yes, thanks!</button>
+            <button class="feedback-btn" id="fb-not-helpful" onclick="selectFeedback('not_helpful')">&#128078; It could use some work</button>
+          </div>
+          <div class="feedback-detail">
+            <textarea id="feedback-text" placeholder="Any comments? (optional)" rows="2"></textarea>
+            <button class="feedback-submit-btn" onclick="sendFeedback()">Send feedback</button>
+          </div>
+        </div>
+        <div id="feedback-thanks-state" style="display:none;">
+          <p class="feedback-thanks">Thanks for your feedback!</p>
+          <button class="feedback-change-btn" onclick="resetFeedback()">Change your feedback</button>
+        </div>
+      </div>
+    </details>
+
     <!-- Static content (always visible, no JS needed) -->
     <main>
       <div class="card how-it-works">
@@ -1082,23 +1155,6 @@ ${phSnippet}
       <p class="footer-note">
         Built with care for 3 out of 52 weeks per year by <a href="https://grantlucas.com/" target="_blank" rel="noopener">Grant Lucas</a>.
       </p>
-      <div class="feedback-section">
-        <p class="feedback-prompt">Was this forecast helpful?</p>
-        <div id="feedback-form">
-          <div class="feedback-buttons">
-            <button class="feedback-btn" id="fb-helpful" onclick="selectFeedback('helpful')">&#128077; Yes, thanks!</button>
-            <button class="feedback-btn" id="fb-not-helpful" onclick="selectFeedback('not_helpful')">&#128078; Not really</button>
-          </div>
-          <div class="feedback-detail">
-            <textarea id="feedback-text" placeholder="Any comments? (optional)" rows="2"></textarea>
-            <button class="feedback-submit-btn" onclick="sendFeedback()">Send feedback</button>
-          </div>
-        </div>
-        <div id="feedback-thanks-state" style="display:none;">
-          <p class="feedback-thanks">Thanks for your feedback!</p>
-          <button class="feedback-change-btn" onclick="resetFeedback()">Change your feedback</button>
-        </div>
-      </div>
     </footer>
   </div>
 </div>
