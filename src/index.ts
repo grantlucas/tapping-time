@@ -767,6 +767,36 @@ function getHTML(): string {
     border: 0;
   }
 
+  .permission-hint {
+    margin: 20px auto 0;
+    padding: 12px 16px;
+    background: #fff;
+    border-radius: 10px;
+    border-left: 3px solid #C67A3C;
+    font-size: 0.84rem;
+    color: #6d6157;
+    text-align: left;
+    max-width: 340px;
+    animation: fadeSlideIn 0.35s ease-out both;
+  }
+
+  .permission-hint strong {
+    color: #5C3D2E;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.88rem;
+  }
+
+  .permission-hint a {
+    color: #5C3D2E;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .permission-hint a:hover {
+    text-decoration-thickness: 2px;
+  }
+
   @media (max-width: 680px) {
     .forecast-day { flex-wrap: wrap; gap: 4px; }
     .forecast-day .temps { min-width: auto; }
@@ -814,6 +844,10 @@ function getHTML(): string {
           </div>
         </div>
         <p>Detecting your location...</p>
+        <div class="permission-hint" id="permission-hint" style="display:none;">
+          <strong>Having trouble enabling location?</strong>
+          <span id="permission-hint-detail"></span>
+        </div>
       </div>
 
       <div class="error-state" id="error" style="display:none;">
@@ -1047,11 +1081,62 @@ function getHTML(): string {
     render();
   };
 
-  function showError(msg) {
+  var locationTimer = null;
+
+  function detectOS() {
+    var ua = navigator.userAgent;
+    if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+      return 'ios';
+    }
+    if (/Android/.test(ua)) {
+      return 'android';
+    }
+    return 'other';
+  }
+
+  function permissionHintHTML(os) {
+    if (os === 'ios') {
+      return 'On iPhone or iPad, go to <strong style="display:inline;color:inherit;">Settings \u2192 Privacy &amp; Security \u2192 Location Services</strong> and make sure your browser can access your location. '
+        + '<a href="https://support.apple.com/en-ca/102647" target="_blank" rel="noopener">Apple support article \u2192</a>';
+    }
+    if (os === 'android') {
+      return 'On Android, tap the lock icon in your browser\u2019s address bar and allow Location, or go to '
+        + '<strong style="display:inline;color:inherit;">Settings \u2192 Location</strong> and make sure it\u2019s enabled. '
+        + '<a href="https://support.google.com/chrome/answer/142065" target="_blank" rel="noopener">Chrome help \u2192</a>';
+    }
+    return 'Check your browser\u2019s address bar for a location permission prompt, or look in your browser settings to allow location access for this site.';
+  }
+
+  function showPermissionHint() {
+    var hint = document.getElementById('permission-hint');
+    document.getElementById('permission-hint-detail').innerHTML = permissionHintHTML(detectOS());
+    hint.style.display = 'block';
+  }
+
+  function clearLocationTimer() {
+    if (locationTimer) {
+      clearTimeout(locationTimer);
+      locationTimer = null;
+    }
+    document.getElementById('permission-hint').style.display = 'none';
+  }
+
+  function showError(msg, helpHTML) {
+    clearLocationTimer();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('forecast-results').style.display = 'none';
-    document.getElementById('error').style.display = 'block';
+    var errorEl = document.getElementById('error');
+    errorEl.style.display = 'block';
     document.getElementById('error-msg').textContent = msg;
+    var existingHelp = errorEl.querySelector('.permission-help');
+    if (existingHelp) existingHelp.remove();
+    if (helpHTML) {
+      var help = document.createElement('div');
+      help.className = 'permission-hint permission-help';
+      help.style.margin = '16px auto 0';
+      help.innerHTML = '<strong>Having trouble?</strong><span>' + helpHTML + '</span>';
+      errorEl.insertBefore(help, errorEl.querySelector('button'));
+    }
   }
 
   function showContent() {
@@ -1096,14 +1181,17 @@ function getHTML(): string {
       return;
     }
 
+    locationTimer = setTimeout(showPermissionHint, 13000);
+
     navigator.geolocation.getCurrentPosition(
       function(pos) {
+        clearLocationTimer();
         fetchForecast(pos.coords.latitude, pos.coords.longitude);
       },
       function(err) {
         switch (err.code) {
           case err.PERMISSION_DENIED:
-            showError('Location permission denied. Please allow location access and try again.');
+            showError('Location permission denied. Please allow location access and try again.', permissionHintHTML(detectOS()));
             break;
           case err.POSITION_UNAVAILABLE:
             showError('Location unavailable. Please try again.');
@@ -1115,11 +1203,12 @@ function getHTML(): string {
             showError('Could not detect your location.');
         }
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+      { enableHighAccuracy: false, timeout: 30000, maximumAge: 300000 }
     );
   }
 
   window.retry = function() {
+    clearLocationTimer();
     document.getElementById('error').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
     document.getElementById('loading').querySelector('p').textContent = 'Detecting your location...';
