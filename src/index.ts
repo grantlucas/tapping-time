@@ -1102,7 +1102,7 @@ function getHTML(): string {
     if (os === 'android') {
       return 'On Android, tap the lock icon in your browser\u2019s address bar and allow Location, or go to '
         + '<strong style="display:inline;color:inherit;">Settings \u2192 Location</strong> and make sure it\u2019s enabled. '
-        + '<a href="https://support.google.com/chrome/answer/142065" target="_blank" rel="noopener">Chrome help \u2192</a>';
+        + '<a href="https://support.google.com/accounts/answer/3467281?hl=en" target="_blank" rel="noopener">Google support article \u2192</a>';
     }
     return 'Check your browser\u2019s address bar for a location permission prompt, or look in your browser settings to allow location access for this site.';
   }
