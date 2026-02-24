@@ -1057,16 +1057,6 @@ ${phSnippet}
     box-shadow: 0 0 0 2px rgba(139, 111, 71, 0.15);
   }
 
-  .postal-form select {
-    padding: 8px 10px;
-    border: 1.5px solid #c2b8a3;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 0.92rem;
-    background: #fff;
-    color: #3e2f23;
-  }
-
   .postal-form button {
     padding: 8px 16px;
     background: #8B6F47;
@@ -1147,13 +1137,9 @@ ${phSnippet}
           <span id="permission-hint-detail"></span>
         </div>
         <div class="postal-fallback">
-          <div class="postal-divider">or enter a postal code</div>
+          <div class="postal-divider">or enter a ZIP / postal code</div>
           <div class="postal-form">
-            <input type="text" id="postal-code" placeholder="e.g. 05602" aria-label="Postal or ZIP code" autocomplete="postal-code">
-            <select id="postal-country" aria-label="Country">
-              <option value="us">US</option>
-              <option value="ca">Canada</option>
-            </select>
+            <input type="text" id="postal-code" placeholder="e.g. 05602 or K1A" aria-label="ZIP or postal code" autocomplete="postal-code">
             <button onclick="lookupPostalCode()">Go</button>
           </div>
         </div>
@@ -1163,13 +1149,9 @@ ${phSnippet}
         <p id="error-msg"></p>
         <button onclick="retry()">Try again</button>
         <div class="postal-fallback">
-          <div class="postal-divider">or use a postal code instead</div>
+          <div class="postal-divider">or use a ZIP / postal code instead</div>
           <div class="postal-form">
-            <input type="text" id="postal-code-error" placeholder="e.g. 05602" aria-label="Postal or ZIP code" autocomplete="postal-code">
-            <select id="postal-country-error" aria-label="Country">
-              <option value="us">US</option>
-              <option value="ca">Canada</option>
-            </select>
+            <input type="text" id="postal-code-error" placeholder="e.g. 05602 or K1A" aria-label="ZIP or postal code" autocomplete="postal-code">
             <button onclick="lookupPostalCode('error')">Go</button>
           </div>
         </div>
@@ -1507,10 +1489,8 @@ ${phSnippet}
         throw new Error(body.error || 'Failed to load forecast');
       }
       forecastData = await resp.json();
-      var locText = document.getElementById('loc-text');
-      if (!locText.textContent) {
-        locText.textContent = lat.toFixed(1) + ', ' + lon.toFixed(1);
-      }
+      document.getElementById('loc-text').textContent =
+        lat.toFixed(1) + ', ' + lon.toFixed(1);
       document.getElementById('header-bar').style.display = 'flex';
 
       var delta = 0.05;
@@ -1572,7 +1552,6 @@ ${phSnippet}
 
   window.retry = function() {
     clearLocationTimer();
-    document.getElementById('loc-text').textContent = '';
     document.getElementById('error').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
     document.getElementById('loading').querySelector('p').textContent = 'Detecting your location...';
@@ -1582,14 +1561,15 @@ ${phSnippet}
   window.lookupPostalCode = function(variant) {
     var suffix = variant === 'error' ? '-error' : '';
     var codeEl = document.getElementById('postal-code' + suffix);
-    var countryEl = document.getElementById('postal-country' + suffix);
     var code = codeEl.value.trim();
-    var country = countryEl.value;
 
     if (!code) {
       codeEl.focus();
       return;
     }
+
+    // Auto-detect: Canadian postal codes start with a letter, US ZIPs start with a digit
+    var country = /^[A-Za-z]/.test(code) ? 'ca' : 'us';
 
     clearLocationTimer();
     document.getElementById('error').style.display = 'none';
@@ -1603,8 +1583,6 @@ ${phSnippet}
       })
       .then(function(geo) {
         safeCapture('postal_code_lookup', { country: country, cached: geo.cached });
-        var label = geo.placeName ? (geo.placeName + (geo.state ? ', ' + geo.state : '')) : (code.toUpperCase());
-        document.getElementById('loc-text').textContent = label;
         fetchForecast(geo.lat, geo.lon);
       })
       .catch(function(err) {
