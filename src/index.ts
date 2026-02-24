@@ -39,6 +39,7 @@ interface ForecastResult {
 }
 
 const CACHE_TTL = 10800; // 3 hours in seconds
+const GEOCODE_CACHE_TTL = 2592000; // 30 days — postal code coords don't change
 
 // ── API handler ────────────────────────────────────────────────────────────
 
@@ -142,6 +143,68 @@ async function handleForecast(request: Request, env: Env): Promise<Response> {
   }
 
   return Response.json(result);
+}
+
+// ── Postal code geocoding ─────────────────────────────────────────────────
+
+async function handleGeocode(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  const postalCode = (url.searchParams.get('postalCode') ?? '').trim();
+  const country = (url.searchParams.get('country') ?? '').trim().toLowerCase();
+
+  if (!postalCode || !country) {
+    return Response.json({ error: 'Missing postalCode or country parameter' }, { status: 400 });
+  }
+
+  if (country !== 'us' && country !== 'ca') {
+    return Response.json({ error: 'Only US and Canadian postal codes are supported' }, { status: 400 });
+  }
+
+  // Normalize: US = 5-digit ZIP, CA = first 3 chars (FSA)
+  const normalizedCode = country === 'ca'
+    ? postalCode.substring(0, 3).toUpperCase()
+    : postalCode.substring(0, 5);
+
+  const cacheKey = `geocode:${country}:${normalizedCode}`;
+
+  // Check KV cache
+  if (env.FORECAST_CACHE) {
+    const cached = await env.FORECAST_CACHE.get(cacheKey);
+    if (cached) {
+      const result = JSON.parse(cached);
+      return Response.json({ ...result, cached: true });
+    }
+  }
+
+  // Fetch from Zippopotam.us
+  const apiUrl = `https://api.zippopotam.us/${country}/${normalizedCode}`;
+  const resp = await fetch(apiUrl);
+
+  if (!resp.ok) {
+    return Response.json({ error: 'Postal code not found' }, { status: 404 });
+  }
+
+  const data: Record<string, unknown> = await resp.json();
+  const places = data.places as Array<Record<string, string>> | undefined;
+
+  if (!places || places.length === 0) {
+    return Response.json({ error: 'Postal code not found' }, { status: 404 });
+  }
+
+  const place = places[0];
+  const result = {
+    lat: parseFloat(place.latitude),
+    lon: parseFloat(place.longitude),
+    placeName: place['place name'],
+    state: place['state abbreviation'] || place.state,
+  };
+
+  // Cache in KV
+  if (env.FORECAST_CACHE) {
+    await env.FORECAST_CACHE.put(cacheKey, JSON.stringify(result), { expirationTtl: GEOCODE_CACHE_TTL });
+  }
+
+  return Response.json({ ...result, cached: false });
 }
 
 // ── Frontend HTML ──────────────────────────────────────────────────────────
@@ -957,6 +1020,76 @@ ${phSnippet}
   .feedback-change-btn:hover {
     color: #5C3D2E;
   }
+
+  .postal-fallback {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 0.88rem;
+    color: #6d6157;
+  }
+
+  .postal-fallback p {
+    margin: 0 0 10px;
+  }
+
+  .postal-form {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .postal-form input {
+    padding: 8px 12px;
+    border: 1.5px solid #c2b8a3;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    width: 120px;
+    background: #fff;
+    color: #3e2f23;
+  }
+
+  .postal-form input:focus {
+    outline: none;
+    border-color: #8B6F47;
+    box-shadow: 0 0 0 2px rgba(139, 111, 71, 0.15);
+  }
+
+  .postal-form button {
+    padding: 8px 16px;
+    background: #8B6F47;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .postal-form button:hover {
+    background: #7B5440;
+  }
+
+  .postal-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0 4px;
+    color: #a89a8a;
+    font-size: 0.82rem;
+  }
+
+  .postal-divider::before,
+  .postal-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #d5cfc6;
+  }
 </style>
 </head>
 <body>
@@ -1003,11 +1136,25 @@ ${phSnippet}
           <strong>Having trouble enabling location?</strong>
           <span id="permission-hint-detail"></span>
         </div>
+        <div class="postal-fallback">
+          <div class="postal-divider">or enter a ZIP / postal code</div>
+          <div class="postal-form">
+            <input type="text" id="postal-code" placeholder="e.g. 05602 or K1A" aria-label="ZIP or postal code" autocomplete="postal-code">
+            <button onclick="lookupPostalCode()">Go</button>
+          </div>
+        </div>
       </div>
 
       <div class="error-state" id="error" style="display:none;">
         <p id="error-msg"></p>
         <button onclick="retry()">Try again</button>
+        <div class="postal-fallback">
+          <div class="postal-divider">or use a ZIP / postal code instead</div>
+          <div class="postal-form">
+            <input type="text" id="postal-code-error" placeholder="e.g. 05602 or K1A" aria-label="ZIP or postal code" autocomplete="postal-code">
+            <button onclick="lookupPostalCode('error')">Go</button>
+          </div>
+        </div>
       </div>
 
       <div id="forecast-results" style="display:none;">
@@ -1411,6 +1558,39 @@ ${phSnippet}
     getLocation();
   };
 
+  window.lookupPostalCode = function(variant) {
+    var suffix = variant === 'error' ? '-error' : '';
+    var codeEl = document.getElementById('postal-code' + suffix);
+    var code = codeEl.value.trim();
+
+    if (!code) {
+      codeEl.focus();
+      return;
+    }
+
+    // Auto-detect: Canadian postal codes start with a letter, US ZIPs start with a digit
+    var country = /^[A-Za-z]/.test(code) ? 'ca' : 'us';
+
+    clearLocationTimer();
+    document.getElementById('error').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('loading').querySelector('p').textContent = 'Looking up postal code...';
+
+    fetch('/api/geocode?postalCode=' + encodeURIComponent(code) + '&country=' + country)
+      .then(function(resp) {
+        if (!resp.ok) return resp.json().then(function(b) { throw new Error(b.error || 'Postal code not found'); });
+        return resp.json();
+      })
+      .then(function(geo) {
+        safeCapture('postal_code_lookup', { country: country, cached: geo.cached });
+        fetchForecast(geo.lat, geo.lon);
+      })
+      .catch(function(err) {
+        safeCapture('forecast_error', { error_type: 'postal_code_error' });
+        showError(err.message || 'Could not look up that postal code.');
+      });
+  };
+
   window._feedbackType = null;
 
   window.selectFeedback = function(type) {
@@ -1438,6 +1618,13 @@ ${phSnippet}
     document.getElementById('feedback-thanks-state').style.display = 'none';
   };
 
+  document.getElementById('postal-code').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') lookupPostalCode();
+  });
+  document.getElementById('postal-code-error').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') lookupPostalCode('error');
+  });
+
   if ('requestIdleCallback' in window) {
     requestIdleCallback(getLocation, { timeout: 2000 });
   } else {
@@ -1457,6 +1644,10 @@ export default {
 
     if (url.pathname === '/api/forecast') {
       return handleForecast(request, env);
+    }
+
+    if (url.pathname === '/api/geocode') {
+      return handleGeocode(request, env);
     }
 
     if (url.pathname === '/robots.txt') {
