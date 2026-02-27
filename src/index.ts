@@ -145,58 +145,59 @@ async function handleForecast(request: Request, env: Env): Promise<Response> {
   return Response.json(result);
 }
 
-// ── Postal code geocoding ─────────────────────────────────────────────────
+// ── Location geocoding (Nominatim) ────────────────────────────────────────
 
 async function handleGeocode(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
-  const postalCode = (url.searchParams.get('postalCode') ?? '').trim();
-  const country = (url.searchParams.get('country') ?? '').trim().toLowerCase();
+  const q = (url.searchParams.get('q') ?? '').trim();
 
-  if (!postalCode || !country) {
-    return Response.json({ error: 'Missing postalCode or country parameter' }, { status: 400 });
+  if (!q) {
+    return Response.json({ error: 'Missing q parameter' }, { status: 400 });
   }
 
-  if (country !== 'us' && country !== 'ca') {
-    return Response.json({ error: 'Only US and Canadian postal codes are supported' }, { status: 400 });
-  }
-
-  // Normalize: US = 5-digit ZIP, CA = first 3 chars (FSA)
-  const normalizedCode = country === 'ca'
-    ? postalCode.substring(0, 3).toUpperCase()
-    : postalCode.substring(0, 5);
-
-  const cacheKey = `geocode:${country}:${normalizedCode}`;
+  const cacheKey = `geocode:q:${q.toLowerCase()}`;
 
   // Check KV cache
   if (env.FORECAST_CACHE) {
     const cached = await env.FORECAST_CACHE.get(cacheKey);
     if (cached) {
-      const result = JSON.parse(cached);
-      return Response.json({ ...result, cached: true });
+      return Response.json({ ...JSON.parse(cached), cached: true });
     }
   }
 
-  // Fetch from Zippopotam.us
-  const apiUrl = `https://api.zippopotam.us/${country}/${normalizedCode}`;
-  const resp = await fetch(apiUrl);
+  // Fetch from Nominatim (restrict to US + Canada — maple country)
+  const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&countrycodes=us,ca&format=json&limit=1&addressdetails=1`;
+  let resp: Response;
+  try {
+    resp = await fetch(nominatimUrl, {
+      headers: { 'User-Agent': 'Sapcast/1.0 (https://sapcast.app)' },
+    });
+  } catch {
+    return Response.json({ error: 'Geocoding service unavailable' }, { status: 502 });
+  }
 
   if (!resp.ok) {
-    return Response.json({ error: 'Postal code not found' }, { status: 404 });
+    return Response.json({ error: 'Geocoding service unavailable' }, { status: 502 });
   }
 
-  const data: Record<string, unknown> = await resp.json();
-  const places = data.places as Array<Record<string, string>> | undefined;
+  const data: Array<Record<string, unknown>> = await resp.json();
 
-  if (!places || places.length === 0) {
-    return Response.json({ error: 'Postal code not found' }, { status: 404 });
+  if (!data || data.length === 0) {
+    return Response.json({ error: 'Location not found' }, { status: 404 });
   }
 
-  const place = places[0];
+  const item = data[0];
+  const address = item.address as Record<string, string> | undefined;
+
+  // Build a short display name: "Burlington, Vermont" or "Ottawa, Ontario"
+  const city = address?.city || address?.town || address?.village || address?.hamlet || address?.county || '';
+  const state = address?.state || '';
+  const placeName = city && state ? `${city}, ${state}` : city || state || String(item.display_name).split(',')[0].trim();
+
   const result = {
-    lat: parseFloat(place.latitude),
-    lon: parseFloat(place.longitude),
-    placeName: place['place name'],
-    state: place['state abbreviation'] || place.state,
+    lat: parseFloat(String(item.lat)),
+    lon: parseFloat(String(item.lon)),
+    placeName,
   };
 
   // Cache in KV
@@ -1046,7 +1047,7 @@ ${phSnippet}
     border-radius: 8px;
     font-family: inherit;
     font-size: 0.92rem;
-    width: 120px;
+    width: 180px;
     background: #fff;
     color: #3e2f23;
   }
@@ -1137,9 +1138,9 @@ ${phSnippet}
           <span id="permission-hint-detail"></span>
         </div>
         <div class="postal-fallback">
-          <div class="postal-divider">or enter a ZIP / postal code</div>
+          <div class="postal-divider">or enter a city or ZIP / postal code</div>
           <div class="postal-form">
-            <input type="text" id="postal-code" placeholder="e.g. 05602 or K1A" aria-label="ZIP or postal code" autocomplete="postal-code">
+            <input type="text" id="postal-code" placeholder="e.g. Burlington VT or 05602" aria-label="City or ZIP / postal code" autocomplete="off">
             <button onclick="lookupPostalCode()">Go</button>
           </div>
         </div>
@@ -1149,9 +1150,9 @@ ${phSnippet}
         <p id="error-msg"></p>
         <button onclick="retry()">Try again</button>
         <div class="postal-fallback">
-          <div class="postal-divider">or use a ZIP / postal code instead</div>
+          <div class="postal-divider">or enter a city or ZIP / postal code instead</div>
           <div class="postal-form">
-            <input type="text" id="postal-code-error" placeholder="e.g. 05602 or K1A" aria-label="ZIP or postal code" autocomplete="postal-code">
+            <input type="text" id="postal-code-error" placeholder="e.g. Burlington VT or 05602" aria-label="City or ZIP / postal code" autocomplete="off">
             <button onclick="lookupPostalCode('error')">Go</button>
           </div>
         </div>
@@ -1478,7 +1479,7 @@ ${phSnippet}
     document.getElementById('forecast-results').style.display = 'block';
   }
 
-  async function fetchForecast(lat, lon) {
+  async function fetchForecast(lat, lon, placeName) {
     document.getElementById('loading').style.display = 'block';
     document.getElementById('loading').querySelector('p').textContent = 'Fetching forecast...';
 
@@ -1490,7 +1491,7 @@ ${phSnippet}
       }
       forecastData = await resp.json();
       document.getElementById('loc-text').textContent =
-        lat.toFixed(1) + ', ' + lon.toFixed(1);
+        placeName || (lat.toFixed(1) + ', ' + lon.toFixed(1));
       document.getElementById('header-bar').style.display = 'flex';
 
       var delta = 0.05;
@@ -1561,33 +1562,30 @@ ${phSnippet}
   window.lookupPostalCode = function(variant) {
     var suffix = variant === 'error' ? '-error' : '';
     var codeEl = document.getElementById('postal-code' + suffix);
-    var code = codeEl.value.trim();
+    var q = codeEl.value.trim();
 
-    if (!code) {
+    if (!q) {
       codeEl.focus();
       return;
     }
 
-    // Auto-detect: Canadian postal codes start with a letter, US ZIPs start with a digit
-    var country = /^[A-Za-z]/.test(code) ? 'ca' : 'us';
-
     clearLocationTimer();
     document.getElementById('error').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
-    document.getElementById('loading').querySelector('p').textContent = 'Looking up postal code...';
+    document.getElementById('loading').querySelector('p').textContent = 'Looking up location...';
 
-    fetch('/api/geocode?postalCode=' + encodeURIComponent(code) + '&country=' + country)
+    fetch('/api/geocode?q=' + encodeURIComponent(q))
       .then(function(resp) {
-        if (!resp.ok) return resp.json().then(function(b) { throw new Error(b.error || 'Postal code not found'); });
+        if (!resp.ok) return resp.json().then(function(b) { throw new Error(b.error || 'Location not found'); });
         return resp.json();
       })
       .then(function(geo) {
-        safeCapture('postal_code_lookup', { country: country, cached: geo.cached });
-        fetchForecast(geo.lat, geo.lon);
+        safeCapture('location_lookup', { cached: geo.cached });
+        fetchForecast(geo.lat, geo.lon, geo.placeName);
       })
       .catch(function(err) {
-        safeCapture('forecast_error', { error_type: 'postal_code_error' });
-        showError(err.message || 'Could not look up that postal code.');
+        safeCapture('forecast_error', { error_type: 'location_lookup_error' });
+        showError(err.message || 'Could not find that location.');
       });
   };
 
